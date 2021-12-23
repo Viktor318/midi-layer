@@ -1,0 +1,9 @@
+[Preset]
+elementsList=Contrabass|Violin
+metronomeBMP=77
+metronomeActive=false
+
+[Metronome]
+active=false
+bmp=120
+volume=0

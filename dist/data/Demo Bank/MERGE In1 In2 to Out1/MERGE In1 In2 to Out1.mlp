@@ -1,0 +1,7 @@
+[Preset]
+elementsList=S1 Ch01|S2 Ch01|S1 Ch02|S2 Ch02|S1 Ch03|S2 Ch03|S1 Ch04|S2 Ch04|S1 Ch05|S2 Ch05|S1 Ch06|S2 Ch06|S1 Ch07|S2 Ch07|S1 Ch08|S2 Ch08|S1 Ch09|S2 Ch09|S1 Ch10|S2 Ch10|S1 Ch11|S2 Ch11|S1 Ch12|S2 Ch12|S1 Ch13|S2 Ch13|S1 Ch14|S2 Ch14|S1 Ch15|S2 Ch15|S1 Ch16|S2 Ch16
+
+[Metronome]
+active=false
+bmp=120
+volume=0
