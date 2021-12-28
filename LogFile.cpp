@@ -22,6 +22,7 @@
 
 #include "LogFile.h"
 
+
 LogFile::LogFile( QString fileName ) {
     logFile.setFileName( fileName );
     logReady 	= logFile.open( QIODevice::Append | QIODevice::Text );
@@ -30,13 +31,16 @@ LogFile::LogFile( QString fileName ) {
     this->start();
 }
 
+
 LogFile::~LogFile( void ) {
 
 }
 
+
 bool LogFile::isReady( void ) {
     return logReady;
 }
+
 
 void LogFile::write( bool supress , QString str ) {
 
@@ -56,6 +60,7 @@ void LogFile::write( bool supress , QString str ) {
 
     mutex.unlock();
 }
+
 
 void LogFile::write( bool supress , QStringList list ) {
 
@@ -81,6 +86,7 @@ void LogFile::write( bool supress , QStringList list ) {
     mutex.unlock();
 }
 
+
 void LogFile::stop( void ) {
     mutex.lock();
     stopLog		= true;
@@ -88,6 +94,7 @@ void LogFile::stop( void ) {
     mutex.unlock();
     wait();
 }
+
 
 void LogFile::run (void) {
     QString	str;
@@ -127,6 +134,7 @@ QString LogFile::timeStamp( void ) {
     QString qstr_date 	= date.toString(date_format);
     return qstr_date + " " + qstr_time + " ";
 }
+
 
 QString LogFile::time( void ) {
 #ifdef __WINDOWS_MM__

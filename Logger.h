@@ -43,7 +43,7 @@
 class Logger
 {
     private:
-        static std::auto_ptr<Logger>   m_pInstance;
+        static std::unique_ptr<Logger>   m_pInstance;
         LogFile                 m_logger;
         /** \brief Private constructor.
          * \details The constructor is made private to allow only one instance
@@ -70,11 +70,9 @@ class Logger
         } Severity;
         static Logger *getInstance(void);
 
-        void log( Severity level , char const *file , int line , char const *func , QString const text );
-        void log( Severity level , char const *file , int line , char const *func , char const *text );
-        void forceLog( char const *file , int line , char const *func , QString const text );
-        void forceLog( char const *file , int line , char const *func , char const *text );
+        void log( Severity level , QString file , int line , QString func , QString text );
         bool isLoggable(Severity level);
+
 };
 
 /* The log facilities are meant to be used with these macros. */
@@ -87,7 +85,7 @@ class Logger
 #define LOG_WARN(msg)   (logger->log(Logger::Warn , __FILE__ , __LINE__ , __PRETTY_FUNCTION__ , (msg) ))
 #define LOG_ERROR(msg)  (logger->log(Logger::Error, __FILE__ , __LINE__ , __PRETTY_FUNCTION__ , (msg) ))
 #define LOG_FATAL(msg)  (logger->log(Logger::Fatal, __FILE__ , __LINE__ , __PRETTY_FUNCTION__ , (msg) ))
-#define LOG_FORCE(msg)  (logger->forceLog(__FILE__ , __LINE__ , __PRETTY_FUNCTION__ , (msg) ))
+
 #define ISLOGGABLE_TRACE (logger->isLoggable(Logger::Trace))
 #define ISLOGGABLE_DEBUG (logger->isLoggable(Logger::Debug))
 #define ISLOGGABLE_INFO  (logger->isLoggable(Logger::Info))

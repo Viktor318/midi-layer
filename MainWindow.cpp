@@ -73,7 +73,6 @@ MainWindow::MainWindow(QApplication */*parent*/)
     panicDock->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);
     this->addDockWidget(Qt::LeftDockWidgetArea, panicDock);
 
-
     this->buildMidiInMonitorDocks();
     this->buildMidiOutMonitorDocks();
     this->buildWindowsMenu();
@@ -361,8 +360,9 @@ void MainWindow::slotUpdateMonitorsNames()   {
     for (int m=0; m<MIDI_SLOTS; m++)    {
         QString label = QString(tr("IN %1 - %2")).arg(m+1).arg(MidiManager::get()->getInPortNameAtSlot(m));
         this->midiInMonitorDock.at(m)->setWindowTitle(label);
-        if (Preferences::get()->getAutoShowHideMonitors())
-            this->midiInMonitorDock.at(m)->setVisible(!(MidiManager::get()->getInPortNameAtSlot(m).isEmpty() ));
+        if (Preferences::get()->getAutoShowHideMonitors())  {
+            this->midiInMonitorDock.at(m)->setVisible( !(MidiManager::get()->getInPortNameAtSlot(m).isEmpty() || QString::compare(MidiManager::get()->getInPortNameAtSlot(m), "[not defined]", Qt::CaseSensitive)) == 0 );
+        }
         // Refresh Menu "Windows" monitors Names
         menuWindows->actions().at(actionsBeforeMonitorsCount+m)->setText(this->midiInMonitorDock.at(m)->windowTitle());
     }
@@ -370,8 +370,9 @@ void MainWindow::slotUpdateMonitorsNames()   {
     for (int m=0; m<MIDI_SLOTS; m++)    {
         QString label = QString(tr("OUT %1 - %2")).arg(m+1).arg(MidiManager::get()->getOutPortNameAtSlot(m));
         this->midiOutMonitorDock.at(m)->setWindowTitle(label);
-        if (Preferences::get()->getAutoShowHideMonitors())
-            this->midiOutMonitorDock.at(m)->setVisible(!(MidiManager::get()->getOutPortNameAtSlot(m).isEmpty() ));
+        if (Preferences::get()->getAutoShowHideMonitors())  {
+            this->midiOutMonitorDock.at(m)->setVisible(!(MidiManager::get()->getOutPortNameAtSlot(m).isEmpty() || QString::compare(MidiManager::get()->getOutPortNameAtSlot(m), "[not defined]", Qt::CaseSensitive) == 0 ));
+        }
         // Refresh Menu "Windows" monitors Names
         menuWindows->actions().at(actionsBeforeMonitorsCount+MIDI_SLOTS+m)->setText(this->midiOutMonitorDock.at(m)->windowTitle());
     }

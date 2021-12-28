@@ -18,31 +18,35 @@
 
 #include "UpdateNotifier.h"
 
+
 UpdateNotifier::UpdateNotifier(QObject *parent):
     QObject(parent)
 { 
     QString fileName = "lastVersionInfo.xml";
     QString timeStr = QDateTime::currentDateTime().toString();
 
-    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=heanet").arg(fileName).arg(timeStr)));
-    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=cznic").arg(fileName).arg(timeStr)));
-    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=kent").arg(fileName).arg(timeStr)));
-    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=garr").arg(fileName).arg(timeStr)));
+    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=heanet").arg(fileName, timeStr)));
+    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=cznic").arg(fileName, timeStr)));
+    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=kent").arg(fileName, timeStr)));
+    urlList.append(new QUrl(QString("http://downloads.sourceforge.net/project/midi-layer/%1?r=&ts=%2&use_mirror=garr").arg(fileName, timeStr)));
 
     this->urlIndex = 0;
     this->connectSignalsAndSlots();
 }
 
+
 void UpdateNotifier::connectSignalsAndSlots()    {
     connect(&mNetworkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetworkReply(QNetworkReply*)));
 }
 
+
 UpdateNotifier::~UpdateNotifier() {
     int q=urlList.size();
-    for (int i=q;i>0;i--)   {
+    for (int i=q; i>0; i--)   {
         delete urlList.at(i-1);
     }
 }
+
 
 void UpdateNotifier::start()   {
 
@@ -54,15 +58,17 @@ void UpdateNotifier::start()   {
     this->invokeNextUrl();
 }
 
+
 void UpdateNotifier::invokeNextUrl()    {
     QUrl * url = this->getNextUrl();
     if (url != NULL)    {
         if (ISLOGGABLE_TRACE) LOG_TRACE(QString("UpdateNotifier request URL[%1]: [%2]").arg( this->urlIndex ).arg( url->toString() ));
         QNetworkRequest request = QNetworkRequest(*url);
-        request.setRawHeader("User-Agent", QString("%1 %2 updates check").arg(APP_NAME).arg(APP_VERSION).toLatin1());
+        request.setRawHeader("User-Agent", QString("%1 %2 updates check").arg(APP_NAME, APP_VERSION).toLatin1());
         mNetworkManager.get(request);
     }
 }
+
 
 QUrl * UpdateNotifier::getNextUrl()   {
     if (this->urlIndex<urlList.size())  {
@@ -72,12 +78,13 @@ QUrl * UpdateNotifier::getNextUrl()   {
     }
 }
 
+
 void UpdateNotifier::onNetworkReply(QNetworkReply* reply)
 {
 
     if(reply->error() == QNetworkReply::NoError)    {
 
-        QString replyString = QString::fromUtf8(reply->readAll().data());
+        QString replyString = QString::fromUtf8(reply->readAll());
         int httpstatuscode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
         if ( httpstatuscode == 302 || httpstatuscode == 303 || httpstatuscode == 307 ||  reply->rawHeaderList().contains("Location") )    {
@@ -87,8 +94,8 @@ void UpdateNotifier::onNetworkReply(QNetworkReply* reply)
             return;
         }
         else if (httpstatuscode == 200 )  {
-            if (ISLOGGABLE_TRACE) LOG_TRACE(QString("Check updates - HTTP OK"));
-            if (ISLOGGABLE_TRACE) LOG_TRACE("Check updates - Downloaded last version information file\n----------------------------------------\n" + replyString + "----------------------------------------");
+            // if (ISLOGGABLE_TRACE) LOG_TRACE(QString("Check updates - HTTP OK"));
+            // if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Check updates - Downloaded last version information file\n----------------------------------------\n%1----------------------------------------").arg(replyString));
             this->checkUpdate(replyString);
         }
         else    {
@@ -104,11 +111,12 @@ void UpdateNotifier::onNetworkReply(QNetworkReply* reply)
 
 }
 
+
 void UpdateNotifier::checkUpdate(QString versionInfo)   {
 
-    QDomDocument doc("mydocument");
+    QDomDocument doc("checkUpdateReply");
     if (!(doc.setContent(versionInfo)) || versionInfo.isEmpty()) {
-        if (ISLOGGABLE_ERROR) LOG_ERROR("Check updates - Fail to check version info file content.");
+        if (ISLOGGABLE_ERROR) LOG_ERROR("Check updates - Fail to parse file content.");
         return;
     }
 
@@ -119,7 +127,7 @@ void UpdateNotifier::checkUpdate(QString versionInfo)   {
         return;
     }
     if (ISLOGGABLE_TRACE) LOG_TRACE("Check updates - Version info file content is ok");
-    QString buildTag=QString("%1_%2").arg(BUILD_OS).arg(BUILD_ARCH);
+    QString buildTag=QString("%1_%2").arg(BUILD_OS, BUILD_ARCH);
     if (ISLOGGABLE_TRACE) LOG_TRACE(QString("Check updates - Checking available version for %1...").arg(buildTag));
     QDomNode osName = root.firstChild();
     while(!osName.isNull()) {
@@ -127,7 +135,7 @@ void UpdateNotifier::checkUpdate(QString versionInfo)   {
         if(!e.isNull()) {
             if (e.tagName() == buildTag) {
                 QString availableVersion = e.attribute("version","0.0.0-0");
-                if (this->hasNewVersion( splitVersionNumbers(QString("%1.%2").arg(APP_VERSION).arg(BUILD_REVISION)), \
+                if (this->hasNewVersion( splitVersionNumbers(QString("%1.%2").arg(APP_VERSION, BUILD_REVISION)), \
                                          splitVersionNumbers(availableVersion)) )  {
                     if (ISLOGGABLE_INFO) LOG_INFO("Check updates - New version available: '"+availableVersion+"'");
                     this->showInfo(availableVersion);
@@ -160,6 +168,7 @@ QList<int> UpdateNotifier::splitVersionNumbers(QString versionStr)  {
     return version;
 }
 
+
 bool UpdateNotifier::hasNewVersion(QList<int> runningVersion, QList<int> lastVersion)  {
 
     QString rv = "";
@@ -186,12 +195,13 @@ bool UpdateNotifier::hasNewVersion(QList<int> runningVersion, QList<int> lastVer
     return newVersionAvailable;
 }
 
+
 void UpdateNotifier::showInfo(QString availableVersion)  {
     QMessageBox msgBox(0);
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setWindowTitle(tr("Update available"));
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setText(QString(tr("New version available: %1.<br>Download it at <a href='%2'>%2</a><br><br>You can disable check updates on preferences.")) \
-                   .arg(availableVersion).arg(qApp->organizationDomain()));
+                   .arg(availableVersion, qApp->organizationDomain()));
     msgBox.exec();
 }

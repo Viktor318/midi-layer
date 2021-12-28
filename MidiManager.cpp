@@ -203,7 +203,8 @@ QMap<QString,int> MidiManager::getAvailableInPorts()  {
         int nPorts = (int) this->midiInDriver->getPortCount();
         if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("There are %1 sources available at MIDI input").arg(nPorts));
         for ( int i=0; i<nPorts; i++ ) {
-            portName = QString::fromStdString(this->midiInDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
+            // portName = QString::fromStdString(this->midiInDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
+            portName = QString::fromStdString(this->midiInDriver->getPortName(i));
             if ( !isExcludedMidiPort( portName ) )  {
                 // portName.replace(QRegExp(":[0-9]+$"),"");
                 availableInPorts.insert(portName,i);
@@ -230,7 +231,8 @@ QMap<QString,int> MidiManager::getAvailableOutPorts()  {
         if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("There are %1 sources available at MIDI output").arg(nPorts));
         for ( int i=0; i<nPorts; i++ ) {
 
-            portName = QString::fromStdString(this->midiOutDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
+            // portName = QString::fromStdString(this->midiOutDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
+            portName = QString::fromStdString(this->midiOutDriver->getPortName(i));
             if ( !isExcludedMidiPort( portName) )   {
                 // portName.replace(QRegExp(":[0-9]+$"),"");
                 availableOutPorts.insert(portName,i);

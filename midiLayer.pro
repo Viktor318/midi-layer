@@ -16,7 +16,7 @@
 #    with this program; If not, see <http://www.gnu.org/licenses/>.
 #
 
-VERSION=1.1.0-alfa
+VERSION=1.1.0-alfa2
 
 #unix    {
 #    VERSION=$$system(echo $(date +%Y\-%m\-%d\_%H\:%M))
@@ -40,7 +40,7 @@ CONFIG += release
 #CONFIG += build_all
 
 # Trace, Debug, Info, Warn, Error, Fatal
-DEFINES += __LOG_LEVEL__=Info
+DEFINES += __LOG_LEVEL__=Debug
 DEFINES += __LOG_FILE__=\\\"MidiLayer.log\\\"    # in temp dir
 
 debug   {
@@ -164,7 +164,7 @@ unix:!macx {
     # jack;
     #LIBS+=-ljack
     #DEFINES+=__LINUX_JACK__
-    DEFINES+=__UNIX_JACK__
+    #DEFINES+=__UNIX_JACK__
     DEFINES += BUILD_OS=\\\"Linux\\\"
 }
 

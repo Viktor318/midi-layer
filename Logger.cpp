@@ -23,6 +23,7 @@
 
 #include "Logger.h"
 
+
 /* TODO: Implement recognition of env var MIDILAYER_LOG_LEVEL */
 
 char const *sevText[7]  = {
@@ -35,14 +36,18 @@ char const *sevText[7]  = {
     "FATAL"
 };
 
-std::auto_ptr<Logger> Logger::m_pInstance;
+
+std::unique_ptr<Logger> Logger::m_pInstance;
+
 
 Logger::Logger() : m_logger(QDir::tempPath() + "/"+__LOG_FILE__) {
 }
 
+
 Logger::~Logger() {
     m_logger.stop();
 }
+
 
 Logger *Logger::getInstance(void) {
     if ( 0==m_pInstance.get() ) {
@@ -56,38 +61,21 @@ Logger *Logger::getInstance(void) {
     return m_pInstance.get();
 }
 
-void Logger::log( Severity level, char const */*file*/, int line, char const *func, QString  const text ) {
 
-    if ( level>=__LOG_LEVEL__ ) {
+void Logger::log( Severity level, QString file, int line, QString func, QString text ) {
+    if ( level >= __LOG_LEVEL__ ) {
         QString msg;
         #ifdef QT_DEBUG
-            msg = QString(";%1;%2(%3);%5").arg(sevText[level]).arg(func).arg(line).arg(text);
-            qDebug() << sevText[level] << ";" << text;
+            msg = QString("[%1] %2 %3 <%4> | %5").arg(sevText[level], file).arg(line).arg(func, text);
+            qDebug() << QString("[%1]").arg(sevText[level]) << text;
         #else
-            msg = QString(";%1;%2").arg(sevText[level]).arg(text);
+            msg = QString("[%1] %2").arg(sevText[level], text);
         #endif
         m_logger.write(false , msg);
     }
 }
 
-void Logger::log( Severity level, char const *file, int line, char const *func, char const *text ) {
-    QString msg(text);
-    log( level , file , line , func , msg );
-}
-
-void Logger::forceLog( char const *file, int line, char const *func, QString const text ) {
-    QString msg( QString("| FORCED | %1(%2) | %3 | %4").arg(file).arg(line).arg(func).arg(text));
-    #ifdef QT_DEBUG
-    qDebug() <<"FORCED |"<< text;
-    #endif
-    m_logger.write(false , msg);
-}
-
-void Logger::forceLog( char const *file, int line, char const *func, char const *text ) {
-    QString msg(text);
-    forceLog(file , line , func , msg );
-}
 
 bool Logger::isLoggable(Severity level)  {
-    return ( level>=__LOG_LEVEL__ );
+    return ( level >= __LOG_LEVEL__ );
 }
