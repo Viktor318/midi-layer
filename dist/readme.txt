@@ -1,4 +1,4 @@
-Midi Layer - Release Notes
+MidiLayer - Release Notes
 ==========================
 
 
