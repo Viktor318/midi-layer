@@ -35,8 +35,8 @@ CONFIG += qt
 # Update Notifier and Metronome UDP
 CONFIG += network
 
-#CONFIG += debug
-CONFIG += release
+CONFIG += debug
+#CONFIG += release
 #CONFIG += debug_and_release
 #CONFIG += build_all
 

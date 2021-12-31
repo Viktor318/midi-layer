@@ -273,13 +273,13 @@ void ElementWidget::deleyedSelectElement()  {
 
     // Send Program Change
     if (ui->groupBoxProgramChange->isChecked()) {
-        MidiManager::get()->sendProgramChange(ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,ui->dialProgram->value()-1);
+        MidiManager::get()->sendProgramChange(ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, ui->dialProgram->value()-1);
         ledOut->flash();
     }
 
     // Send initial Volume
     if (ui->groupBoxVolume->isChecked())    {
-        MidiManager::get()->sendController(ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,CTL_VOLUME,ui->vsVolume->value());
+        MidiManager::get()->sendController(ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, CTL_VOLUME, ui->vsVolume->value());
         ledOut->flash();
     }
 

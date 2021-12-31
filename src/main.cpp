@@ -237,7 +237,7 @@ void showSplashScreen() {
     QRect srect(0, 0, splash->width(), splash->height());
     splash->move(qApp->screens().at(0)->availableGeometry().center() - srect.center());
     splash->show();
-    splash->showMessage ( QString( "<span style=\"color: #CCCCCC;\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version %1 - Copyright (C) 2012-2022, %3</span>")
+    splash->showMessage ( QString( "<span style=\"color: #EEEEEE;\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version %1 - Copyright (C) 2012-2022, %3</span>")
                           .arg( QApplication::applicationVersion(),
                                 QApplication::organizationName() ), Qt::AlignLeft | Qt::AlignBottom, QColor(Qt::blue) );
 }

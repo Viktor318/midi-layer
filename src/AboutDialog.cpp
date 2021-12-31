@@ -49,7 +49,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     buildInfoHtml.append(this->buildLine(tr("RtMidi"), RTMIDI_VERSION));
 
     buildInfoHtml.append(this->buildLine(tr("Settings file"), APP_SETTINGS_FILE));
-    buildInfoHtml.append(this->buildLine(tr("Data dir"), APP_DATA_DIR));
+    buildInfoHtml.append(this->buildLine(tr("Data dir"), Utils::get()->getDataDir()));
     buildInfoHtml.append(this->buildLine(tr("Trash dir"),QString("./%1").arg(APP_TRASH_DIR) ));
     buildInfoHtml.append(this->buildLine(tr("Bank file extension"), APP_DATA_BANK_EXTENSION));
     buildInfoHtml.append(this->buildLine(tr("Preset file extension"), APP_DATA_PRESET_EXTENSION));
