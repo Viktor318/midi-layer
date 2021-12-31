@@ -17,7 +17,7 @@
 #
 
 
-VERSION=1.1.0-alfa2
+VERSION=1.1.0-alfa3
 
 #unix    {
 #    VERSION=$$system(echo $(date +%Y\-%m\-%d\_%H\:%M))
@@ -35,13 +35,13 @@ CONFIG += qt
 # Update Notifier and Metronome UDP
 CONFIG += network
 
-CONFIG += debug
-#CONFIG += release
+#CONFIG += debug
+CONFIG += release
 #CONFIG += debug_and_release
 #CONFIG += build_all
 
 # Trace, Debug, Info, Warn, Error, Fatal
-DEFINES += __LOG_LEVEL__=Debug
+DEFINES += __LOG_LEVEL__=Info
 DEFINES += __LOG_FILE__=\\\"MidiLayer.log\\\"    # in temp dir
 
 debug   {
