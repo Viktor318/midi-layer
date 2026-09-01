@@ -1,0 +1,5 @@
+[Bank]
+presetsOrderLocked=false
+presetsList=Piano & Strings|Orchestra|BYPASS slot 1|MERGE In1 In2 to Out1|THRU In1 to Out1 Out2
+presetSelected=Piano & Strings
+infoMessage=<h3>Demo Bank</h3><p>This is a demo bank of Midi Layer.<br>With Midi Layer you can manage MIDI as you wish.</p>

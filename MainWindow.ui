@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>827</width>
+    <height>597</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>827</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="geometry">
+     <rect>
+      <x>242</x>
+      <y>97</y>
+      <width>144</width>
+      <height>158</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <property name="separatorsCollapsible">
+     <bool>false</bool>
+    </property>
+    <addaction name="actionNewBank"/>
+    <addaction name="actionOpenBank"/>
+    <addaction name="actionCloneBank"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionPanic"/>
+    <addaction name="actionMonitor"/>
+    <addaction name="actionSetup"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAboutQt"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionAddPreset"/>
+    <addaction name="actionDuplicatePreset"/>
+    <addaction name="actionCopyPreset"/>
+    <addaction name="actionPastePreset"/>
+    <addaction name="actionRemovePreset"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddElement"/>
+    <addaction name="actionDuplicateElement"/>
+    <addaction name="actionCopyElement"/>
+    <addaction name="actionPasteElement"/>
+    <addaction name="actionRemoveElement"/>
+   </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>&amp;Debug</string>
+    </property>
+    <addaction name="actionAction_1"/>
+    <addaction name="actionAction_2"/>
+    <addaction name="actionAction_3"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="title">
+     <string>&amp;Windows</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuWindows"/>
+   <addaction name="menuHelp"/>
+   <addaction name="menuDebug"/>
+  </widget>
+  <action name="actionSetup">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/tools.png</normaloff>:/images/tools.png</iconset>
+   </property>
+   <property name="text">
+    <string>MIDI &amp;Setup</string>
+   </property>
+   <property name="statusTip">
+    <string>Setup MIDI interfaces</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/exit.png</normaloff>:/images/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit program</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/info.png</normaloff>:/images/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About Midi Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>About program</string>
+   </property>
+   <property name="statusTip">
+    <string>About this program</string>
+   </property>
+  </action>
+  <action name="actionMonitor">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/monitor.png</normaloff>:/images/monitor.png</iconset>
+   </property>
+   <property name="text">
+    <string>MIDI &amp;Monitor</string>
+   </property>
+   <property name="statusTip">
+    <string>MIDI Monitor for view input signal</string>
+   </property>
+   <property name="whatsThis">
+    <string>MONITOR</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionPanic">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/reset.png</normaloff>:/images/reset.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Reset all MIDI out</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset all MIDI out</string>
+   </property>
+   <property name="statusTip">
+    <string>PANIC!</string>
+   </property>
+   <property name="shortcut">
+    <string>F12</string>
+   </property>
+  </action>
+  <action name="actionCopyElement">
+   <property name="text">
+    <string>Copy Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionAddElement">
+   <property name="text">
+    <string>Add Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionRemoveElement">
+   <property name="text">
+    <string>Remove Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionViewPresetsMixDock">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;View presets dock</string>
+   </property>
+  </action>
+  <action name="actionAction_1">
+   <property name="text">
+    <string>Action &amp;1</string>
+   </property>
+   <property name="shortcut">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="actionAction_2">
+   <property name="text">
+    <string>Action &amp;2</string>
+   </property>
+   <property name="shortcut">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="actionAddPreset">
+   <property name="text">
+    <string>Add Preset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionCopyPreset">
+   <property name="text">
+    <string>Copy Preset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionRemovePreset">
+   <property name="text">
+    <string>Remove Preset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionPastePreset">
+   <property name="text">
+    <string>Paste Preset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionPasteElement">
+   <property name="text">
+    <string>Paste Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionNewBank">
+   <property name="text">
+    <string>&amp;New bank</string>
+   </property>
+  </action>
+  <action name="actionOpenBank">
+   <property name="text">
+    <string>&amp;Open bank</string>
+   </property>
+  </action>
+  <action name="actionCloneBank">
+   <property name="text">
+    <string>&amp;Clone bank</string>
+   </property>
+  </action>
+  <action name="action_Mute_metronome">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Mute metronome</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/config.png</normaloff>:/images/config.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Options</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/qt.png</normaloff>:/images/qt.png</iconset>
+   </property>
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="actionDuplicatePreset">
+   <property name="text">
+    <string>Duplicate Preset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionDuplicateElement">
+   <property name="text">
+    <string>Duplicate Element</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E, Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionAction_3">
+   <property name="text">
+    <string>Action &amp;3</string>
+   </property>
+   <property name="shortcut">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="actionPreset_List">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Bank</string>
+   </property>
+  </action>
+  <action name="actionSequencer_Controller">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sequencer Controller</string>
+   </property>
+  </action>
+  <action name="actionMetronome">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Metronome</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
