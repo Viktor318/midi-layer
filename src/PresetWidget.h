@@ -127,6 +127,7 @@ private:
 private slots:
 
     void slotNameChanged();
+    void slotNameEdited(const QString & text);     // Windows fork
     void slotRevert();
     void slotElementNameChanged(QString oldName, QString newName);
     void slotSetEdited();

@@ -158,6 +158,8 @@ void ElementWidget::setupGuiConnections()  {
     connect(ui->buttonEnable, SIGNAL(released()), this, SLOT(slotMarkEdited()));
     connect(ui->cbResetChannelOnUnselect, SIGNAL(clicked()), this, SLOT(slotMarkEdited()));
     connect(ui->lName, SIGNAL(editingFinished()), this, SLOT(slotNameChanged()) );
+    // Windows fork: a mentés gomb már gépelés közben megjelenik, nem csak a mező elhagyásakor
+    connect(ui->lName, SIGNAL(textEdited(QString)), this, SLOT(slotNameEdited(QString)) );
     connect(this->ui->buttonRevert, SIGNAL(released()), this, SLOT(slotRevert()));
     connect(this->ui->buttonSave, SIGNAL(released()), this, SLOT(slotSave()));
 
@@ -799,6 +801,19 @@ void ElementWidget::slotOctaveDown()    {
 void ElementWidget::slotOctaveUp()    {
     this->ui->dialTranspose->setValue( this->ui->dialTranspose->value()+12 );
     this->slotMarkEdited();
+}
+
+
+// Windows fork: a névmező gépelés közbeni változása. Csak megjelöli az elemet szerkesztettként
+// (megjelenik a mentés gomb); maga az átnevezés továbbra is a mező elhagyásakor
+// (slotNameChanged), illetve mentéskor (renameIfNedded) történik. Ha a mentés gombra
+// kattintunk, a mező előbb elveszti a fókuszt, így a slotNameChanged a mentés előtt lefut.
+void ElementWidget::slotNameEdited(const QString & text)   {
+    if (text != this->elementName) {
+        this->slotMarkEdited();
+        // ugyanaz, mint a slotNameChanged-ben: mentéskor a preset elemlistája is frissüljön
+        this->savePresetOnSave = true;
+    }
 }
 
 

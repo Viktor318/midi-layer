@@ -111,6 +111,8 @@ PresetWidget::PresetWidget(QWidget *parent) :
     vMainLayout->addWidget(tabElement);
 
     connect (this->nameEdit, SIGNAL(editingFinished()), this, SLOT( slotNameChanged() ) );
+    // Windows fork: a mentés gomb már gépelés közben megjelenik, nem csak a mező elhagyásakor
+    connect (this->nameEdit, SIGNAL(textEdited(QString)), this, SLOT( slotNameEdited(QString) ) );
 
     connect (buttonRevert, SIGNAL(released()), this, SLOT( slotRevert() ) );
     connect (buttonSave, SIGNAL(released()), this, SLOT( slotSave() ) );
@@ -393,6 +395,17 @@ LinkButton * PresetWidget::buildForkButton()   {
     button->setToolTip(QString("%1 a GitHubon: %2").arg(APP_NAME).arg(FORK_URL));
     button->setUrl(FORK_URL);
     return button;
+}
+
+
+// Windows fork: a névmező gépelés közbeni változása. Csak megjelöli a presetet szerkesztettként
+// (megjelenik a mentés gomb); maga az átnevezés továbbra is a mező elhagyásakor történik
+// (slotNameChanged). Ha a mentés gombra kattintunk, a mező előbb elveszti a fókuszt, így az
+// átnevezés a mentés előtt lefut.
+void PresetWidget::slotNameEdited(const QString & text)   {
+    if (text != this->presetName) {
+        this->setEdited(true);
+    }
 }
 
 

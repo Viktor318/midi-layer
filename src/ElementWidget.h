@@ -156,6 +156,7 @@ private slots:
     void slotSelectInvertControllers();
 
     void slotNameChanged();
+    void slotNameEdited(const QString & text);     // Windows fork
     void slotMidiOutChanged();
 
     void slotFindController(QString findText);
