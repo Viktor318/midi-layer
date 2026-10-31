@@ -44,12 +44,22 @@ PresetsListWidget::PresetsListWidget(QWidget *parent, QWidget * centralWidget) :
     QFont font;
     Utils::get()->configDisplayFont(&font);
     bankNameEdit->setFont(font);
-    bankNameEdit->setStyleSheet(QString::fromUtf8("background-color: #8aa1be; color: #000000; padding-left:4px;"));
+    bankNameEdit->setStyleSheet(QString::fromUtf8("background-color: #8aa1be; color: #000000; padding-left:10px;"));
     bankNameEdit->setMinimumHeight(29);
     bankNameEdit->setMaximumHeight(29);
     bankNameEdit->setMaximumWidth(1024);
     bankNameEdit->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
     bankNameEdit->setValidator(new QRegularExpressionValidator(Utils::get()->getNameRegexValidator(), this));
+
+    // Windows fork: a 2016-os (1.0) felület függőleges "BANK" felirata, amit a szerző
+    // 2021-ben kivett. A névmező gyermekeként kerül vissza, így a mezővel együtt mozog
+    // (stílustól és ablakmérettől függetlenül); az eltolás (1, 3) az eredeti Element.ui-ból
+    // származik. Az egérkattintásokat átengedi a mezőnek.
+    bankLabelTag = new QWidget(bankNameEdit);
+    bankLabelTag->setEnabled(false);
+    bankLabelTag->setAttribute(Qt::WA_TransparentForMouseEvents);
+    bankLabelTag->setGeometry(QRect(1, 3, 10, 24));
+    bankLabelTag->setStyleSheet(QStringLiteral("background-image: url(:/images/vlabel_bank.png);"));
 
     buttonLock = buildCheckableButton("lock/unlock presets order", ":/images/stock_lock_open_16.png", ":/images/stock_lock_16.png");
     buttonLock->setChecked(true);

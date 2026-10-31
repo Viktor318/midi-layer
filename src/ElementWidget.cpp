@@ -161,6 +161,16 @@ void ElementWidget::setupGuiConnections()  {
     // Windows fork: a mentés gomb már gépelés közben megjelenik, nem csak a mező elhagyásakor
     connect(ui->lName, SIGNAL(textEdited(QString)), this, SLOT(slotNameEdited(QString)) );
     ui->lName->installEventFilter(this);
+
+    // Windows fork: a 2016-os (1.0) felület függőleges "ELEMENT" felirata, amit a szerző
+    // 2021-ben kivett. A névmező gyermekeként kerül vissza, így a mezővel együtt mozog
+    // (stílustól és ablakmérettől függetlenül); az eltolás (1, 3) az eredeti Element.ui-ból
+    // származik. Az egérkattintásokat átengedi a mezőnek.
+    QWidget * elementLabelTag = new QWidget(ui->lName);
+    elementLabelTag->setEnabled(false);
+    elementLabelTag->setAttribute(Qt::WA_TransparentForMouseEvents);
+    elementLabelTag->setGeometry(QRect(1, 3, 10, 24));
+    elementLabelTag->setStyleSheet(QStringLiteral("background-image: url(:/images/vlabel_element.png);"));
     connect(this->ui->buttonRevert, SIGNAL(released()), this, SLOT(slotRevert()));
     connect(this->ui->buttonSave, SIGNAL(released()), this, SLOT(slotSave()));
 

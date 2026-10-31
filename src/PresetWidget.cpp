@@ -38,12 +38,22 @@ PresetWidget::PresetWidget(QWidget *parent) :
     nameEdit->setMinimumHeight(29);
     nameEdit->setMaximumHeight(29);
     nameEdit->setFont(font);
-    nameEdit->setStyleSheet(QString::fromUtf8("background-color: #9bb6d8; color: #000000; padding-left:4px;"));
+    nameEdit->setStyleSheet(QString::fromUtf8("background-color: #9bb6d8; color: #000000; padding-left:10px;"));
     nameEdit->setMaxLength(48);
     nameEdit->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
     nameEdit->setValidator(new QRegularExpressionValidator(Utils::get()->getNameRegexValidator(), this));
     nameEdit->setText("");
     nameEdit->setToolTip("Preset name. Click to edit.");
+
+    // Windows fork: a 2016-os (1.0) felület függőleges "PRESET" felirata, amit a szerző
+    // 2021-ben kivett. A névmező gyermekeként kerül vissza, így a mezővel együtt mozog
+    // (stílustól és ablakmérettől függetlenül); az eltolás (1, 3) az eredeti Element.ui-ból
+    // származik. Az egérkattintásokat átengedi a mezőnek.
+    presetLabelTag = new QWidget(nameEdit);
+    presetLabelTag->setEnabled(false);
+    presetLabelTag->setAttribute(Qt::WA_TransparentForMouseEvents);
+    presetLabelTag->setGeometry(QRect(1, 3, 10, 24));
+    presetLabelTag->setStyleSheet(QStringLiteral("background-image: url(:/images/vlabel_preset.png);"));
     presetName = "";
 
     pcLabel = new QLabel(this);

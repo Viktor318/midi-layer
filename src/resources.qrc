@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>images/refresh_12.png</file>
+        <file>images/vlabel_bank.png</file>
+        <file>images/vlabel_preset.png</file>
+        <file>images/vlabel_element.png</file>
         <file>images/button_add.png</file>
         <file>images/button_clone.png</file>
         <file>images/button_remove.png</file>

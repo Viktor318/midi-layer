@@ -1977,7 +1977,7 @@
     <string>Element name. Click to edit.</string>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #abc5e4; color: #000000; padding-left:4px;</string>
+    <string notr="true">background-color: #abc5e4; color: #000000; padding-left:10px;</string>
    </property>
    <property name="text">
     <string>init element</string>
