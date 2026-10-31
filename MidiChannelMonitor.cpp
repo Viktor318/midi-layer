@@ -22,7 +22,7 @@ MidiChannelMonitor::MidiChannelMonitor(QWidget *parent, direction portDirection)
     : QWidget(parent)   {
 
     this->hBoxChannels = new QHBoxLayout();
-    this->hBoxChannels->setMargin(0);
+    this->hBoxChannels->setContentsMargins(0, 0, 0, 0);
     this->hBoxChannels->setSpacing(0);
 
     this->slotLed = new Led(this,16,11);
@@ -51,7 +51,7 @@ MidiChannelMonitor::MidiChannelMonitor(QWidget *parent, direction portDirection)
         this->hBoxChannels->addWidget(led[m]);
     }
 
-    this->hBoxChannels->setMargin(4);
+    this->hBoxChannels->setContentsMargins(4, 4, 4, 4);
     this->setLayout(this->hBoxChannels);
 }
 

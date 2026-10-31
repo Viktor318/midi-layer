@@ -50,5 +50,9 @@
 // PLEASE DO NOT CHANGE NEXT LINE
 #define DONATE_URL                  "https://www.paypal.com/bt/webapps/mpp/send-money-online"
 
+// A Windows fork adatai (a fejlécben, az egykori adományozó gomb helyén jelennek meg)
+#define FORK_TEXT                   "Windows fork by Viktor318"
+#define FORK_URL                    "https://github.com/Viktor318/midi-layer"
+
 #endif // CONFIG_H
 

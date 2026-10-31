@@ -24,7 +24,7 @@ VertLabel::VertLabel(QString txt, QWidget *parent): QLabel(parent)
     QFont font("sans",24);
     QFontMetrics fm(font);
 
-    int pixelsWide = fm.width(txt);
+    int pixelsWide = fm.horizontalAdvance(txt);
     int pixelsHigh = fm.height();
     this->resize(pixelsHigh,pixelsWide);
 

@@ -1,0 +1,19 @@
+# Visual Studio munkafájlok
+.vs/
+
+# Qt Creator build-mappák és felhasználói beállítások
+build/
+build-*/
+*.pro.user
+*.pro.user.*
+!midiLayer.pro.user.mac
+.qtc_clangd/
+
+# Fordítási kimenet
+*.o
+*.obj
+*.exe
+Makefile*
+moc_*.cpp
+ui_*.h
+qrc_*.cpp

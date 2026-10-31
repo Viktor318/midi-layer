@@ -1,3 +1,4 @@
+#include <QRegularExpression>
 #include "Metronome.h"
 #include "ui_Metronome.h"
 
@@ -130,7 +131,7 @@ Metronome::~Metronome() {
                         .arg( QDateTime::currentMSecsSinceEpoch() )
                         .arg(ui->dialTempo->sliderPosition())
                         .arg("0")
-                        .arg(this->udpOrdinal++));
+                        .arg(this->udpOrdinal++).toUtf8());   // Qt 6: QByteArray::append(QString) megszűnt
         udpSocketSend->write(datagram);
         udpSocketSend->write(datagram);
     }
@@ -277,7 +278,7 @@ void Metronome::sendUDP() {
                         .arg( ui->dialTempo->sliderPosition() )
                         .arg( this->isRunning?"1":"0" )
                         .arg( this->udpOrdinal++ )
-                        .arg( this->currentPresetName) );
+                        .arg( this->currentPresetName).toUtf8() );   // Qt 6: QByteArray::append(QString) megszűnt
         udpSocketSend->write(datagram);
         udpSocketSend->write(datagram);
 //        LOG_TRACE(QString("Metronome datagram: %1").arg(datagram.toStdString()));
@@ -305,7 +306,7 @@ void Metronome::slotTapTempo()  {
         ui->buttonTapTempo->setStyleSheet("color: rgb(255, 64, 64);");
     }
     else    {
-        tapTempoRecords.append(tapTempoStopwatch.restart());
+        tapTempoRecords.append(static_cast<int>(tapTempoStopwatch.restart()));
         tapTempoTimer->start();
         this->led->flash();
         // if (ISLOGGABLE_TRACE) LOG_TRACE(QString("Elapsed: %1").arg(tapTempoRecords.last()));
@@ -416,9 +417,11 @@ void Metronome::slotPhononStateLog()  {
 
 QString Metronome::obtainBroadcastIp()  {
 
-    QRegExp rx("^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.).*$");
-    if (Preferences::get()->getMetronomeUdpNetwork().contains(rx))  {
-        QString broadcastIp = rx.cap(1)+"255";
+    // Qt 6: QRegExp -> QRegularExpression
+    QRegularExpression rx("^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.).*$");
+    QRegularExpressionMatch rxMatch = rx.match(Preferences::get()->getMetronomeUdpNetwork());
+    if (rxMatch.hasMatch())  {
+        QString broadcastIp = rxMatch.captured(1)+"255";
         if (ISLOGGABLE_INFO) LOG_INFO(QString("Configured broadcast IP: " + broadcastIp));
         return broadcastIp;
     }
@@ -432,8 +435,9 @@ QString Metronome::obtainBroadcastIp()  {
         QByteArray out = proc->readAllStandardOutput();
         QString outStr = QString::fromLatin1(out);
 
-        if (outStr.contains(rx))   {
-            QString broadcastIp = rx.cap(1)+"255";
+        QRegularExpressionMatch outMatch = rx.match(outStr);   // Qt 6: QRegExp -> QRegularExpression
+        if (outMatch.hasMatch())   {
+            QString broadcastIp = outMatch.captured(1)+"255";
             if (ISLOGGABLE_INFO) LOG_INFO(QString("Autodetect broadcast IP: " + broadcastIp));
             return broadcastIp;
         }

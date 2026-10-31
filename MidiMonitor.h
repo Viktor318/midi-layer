@@ -22,7 +22,7 @@
 #include <QtWidgets/QtWidgets>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QScrollBar>
-#include <QtWidgets/QAction>
+#include <QAction>
 
 #include "RtMidi/RtMidi.h"
 #include "RtMidi/RtError.h"
@@ -38,7 +38,7 @@
 
 
 #ifdef QT_DEBUG
-#include <QtWidgets/QAction>
+#include <QAction>
 #endif
 
 namespace Ui {

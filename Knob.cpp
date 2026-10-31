@@ -64,7 +64,7 @@ void Knob::mousePressEvent ( QMouseEvent *pMouseEvent )
         m_posMouse = pMouseEvent->pos();
         m_lastDragValue = float(sliderPosition());
         emit sliderPressed();
-    } else if (pMouseEvent->button() == Qt::MidButton) {
+    } else if (pMouseEvent->button() == Qt::MiddleButton) {
         // Reset to default value...
         if (m_iDefaultValue < minimum() || m_iDefaultValue > maximum())
             m_iDefaultValue = (maximum() + minimum()) / 2;
@@ -130,7 +130,7 @@ void Knob::wheelEvent ( QWheelEvent *pWheelEvent )
         QDial::wheelEvent(pWheelEvent);
     } else {
         int iValue = sliderPosition();
-        if (pWheelEvent->delta() < 0)
+        if (pWheelEvent->angleDelta().y() < 0)
             iValue -= pageStep();
         else
             iValue += pageStep();

@@ -16,6 +16,7 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRegularExpression>
 #include "PresetWidget.h"
 
 PresetWidget::PresetWidget(QWidget *parent) :
@@ -39,7 +40,7 @@ PresetWidget::PresetWidget(QWidget *parent) :
     nameEdit->setStyleSheet(QString::fromUtf8("background-color: #9bb6d8; color: #000000; padding-left:10px;"));
     nameEdit->setMaxLength(48);
     nameEdit->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
-    nameEdit->setValidator(new QRegExpValidator(Utils::get()->getNameRegexValidator(), this));
+    nameEdit->setValidator(new QRegularExpressionValidator(Utils::get()->getNameRegexValidator(), this));
     nameEdit->setText("");
     presetName = "";
 
@@ -81,8 +82,10 @@ PresetWidget::PresetWidget(QWidget *parent) :
     hBoxHeader->addSpacing(7);
     hBoxHeader->addWidget(buttonSave, 10, Qt::AlignCenter);
     hBoxHeader->addSpacing(24);
-    donateButton = buildDonateButton();
-    hBoxHeader->addWidget(donateButton, 10, Qt::AlignRight);
+    // Az eredeti szerző adományozásra felhívó gombja helyett (az eredeti fejlesztés évek
+    // óta áll, a cím sem aktuális) a Windows fork visszafogott, kattintható felirata.
+    forkButton = buildForkButton();
+    hBoxHeader->addWidget(forkButton, 10, Qt::AlignRight);
     hBoxHeader->addSpacing(24);
     hBoxHeader->addWidget(buttonRemove, 5, Qt::AlignRight);
     hBoxHeader->addWidget(buttonClone, 5, Qt::AlignRight);
@@ -97,10 +100,14 @@ PresetWidget::PresetWidget(QWidget *parent) :
     vMainLayout->addLayout(hBoxHeader);
     vMainLayout->addWidget(tabElement);
 
-    presetLabelTag = new QWidget(this);
+    // A "PRESET" függőleges címke a névmező gyermeke lett, így a mezővel együtt mozog.
+    // Korábban a PresetWidget-en belül, fix (74, 19) koordinátán ült, ami más stílusnál
+    // (Qt 6 / Fusion) elcsúszott. Az eltolás (1, 3) ugyanaz, mint az "ELEMENT" címkénél
+    // az Element.ui-ban (mező: 39, 7 - címke: 40, 10).
+    presetLabelTag = new QWidget(nameEdit);
     presetLabelTag->setEnabled(false);
 
-    presetLabelTag->setGeometry(QRect(74, 19, 10, 24));
+    presetLabelTag->setGeometry(QRect(1, 3, 10, 24));
     presetLabelTag->setStyleSheet(QStringLiteral("background-image: url(:/images/vlabel_preset.png);"));
 
     connect (this->nameEdit, SIGNAL(editingFinished()), this, SLOT( slotNameChanged() ) );
@@ -148,7 +155,7 @@ bool PresetWidget::load(QString bankName, QString presetName)   {
 
     if (ISLOGGABLE_INFO) LOG_INFO("loading preset \"" + bankName + "/" + presetName+"\"");
 
-    if (presetName == 0 || presetName.isEmpty())    {
+    if (presetName.isEmpty())   /* Qt 6: a "== 0" összehasonlítás nem fordul; Qt 5-ben is az üres szövegre vizsgált */    {
         this->presetName = "";
         return false;
     }
@@ -181,7 +188,7 @@ bool PresetWidget::load(QString bankName, QString presetName)   {
 
         for (int i=0; i<elementFilesOnFolder.count(); i++)  {
             QString elementFounded = elementFilesOnFolder.at(i);
-            elementFounded.replace(QRegExp(QRegExp::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
+            elementFounded.replace(QRegularExpression(QRegularExpression::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
             if (!elementFounded.isEmpty())
                 elementsListForLoad.append(elementFounded);
         }
@@ -204,7 +211,7 @@ bool PresetWidget::load(QString bankName, QString presetName)   {
         // Load elements not listed in preset definitions
         for (int f=0; f<elementFilesOnFolder.count(); f++)   {
             QString elementOnFolder = elementFilesOnFolder.at(f);
-            elementOnFolder.replace(QRegExp(QRegExp::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
+            elementOnFolder.replace(QRegularExpression(QRegularExpression::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
             if (!elementsListForLoad.contains(elementOnFolder))    {
                 elementsListForLoad.append(elementOnFolder);
                 if (ISLOGGABLE_TRACE) LOG_TRACE("added founded extra element:"+ elementOnFolder);
@@ -274,7 +281,7 @@ void PresetWidget::setSelectedElement(QString elementName) {
 
 void PresetWidget::slotSave()   {
 
-    if (presetName != NULL && presetName.isEmpty())   {
+    if (presetName.isEmpty())   /* Qt 6: az eredeti "presetName != NULL && presetName.isEmpty()" feltétel sosem teljesült (Qt 5-ben a NULL-lal való összevetés az üres szövegre vizsgált), így üres néven is mentett - a szándék szerint javítva */   {
         if (ISLOGGABLE_ERROR) LOG_ERROR("Preset name is not defined");
         return;
     }
@@ -355,16 +362,14 @@ QPushButton * PresetWidget::buildActionButton(QString toolTip, QString resourceN
     return button;
 }
 
-LinkButton * PresetWidget::buildDonateButton()   {
+LinkButton * PresetWidget::buildForkButton()   {
     LinkButton * button = new LinkButton(this);
-    button->setMaximumWidth(250);
-    button->setMinimumWidth(250);
     button->setMaximumHeight(26);
     button->setCursor(QCursor(Qt::PointingHandCursor));
-    button->setText("please donate to midilayer@gmail.com");
-    button->setStyleSheet("background-color: #F781F3; color: #444444; border-radius: 3px;");
-    button->setToolTip(QString("If you find this program useful, please help us improve it. Say what you like to see in %1.").arg(APP_NAME));
-    button->setUrl(DONATE_URL);
+    button->setText(FORK_TEXT);
+    button->setStyleSheet("background-color: transparent; color: #808080; border: none;");
+    button->setToolTip(QString("%1 a GitHubon: %2").arg(APP_NAME).arg(FORK_URL));
+    button->setUrl(FORK_URL);
     return button;
 }
 
@@ -547,7 +552,7 @@ QString PresetWidget::getCloneName(QString pretendedName)   {
         if (elementsFilesOnFolder.count()>0)
             existingPresets << dirsInBankFolder.at(i);
     }
-    existingPresets.replaceInStrings(QRegExp(QRegExp::escape(APP_DATA_PRESET_EXTENSION)+"$"),"");
+    existingPresets.replaceInStrings(QRegularExpression(QRegularExpression::escape(APP_DATA_PRESET_EXTENSION)+"$"),"");
     return Utils::get()->getCloneName(pretendedName, existingPresets);
 }
 

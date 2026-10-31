@@ -30,7 +30,7 @@ PresetsListWidget::PresetsListWidget(QWidget *parent, QWidget * centralWidget) :
     Utils::get()->configDisplayFont(&listFont);
 
     dockLayout = new QVBoxLayout();
-    dockLayout->setMargin(2);
+    dockLayout->setContentsMargins(2, 2, 2, 2);
     dockLayout->setSpacing(4);
 
     presetList = new QListWidget();
@@ -48,7 +48,7 @@ PresetsListWidget::PresetsListWidget(QWidget *parent, QWidget * centralWidget) :
     bankNameEdit->setMaximumHeight(29);
     bankNameEdit->setMaximumWidth(1024);
     bankNameEdit->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
-    bankNameEdit->setValidator(new QRegExpValidator(Utils::get()->getNameRegexValidator(), this));
+    bankNameEdit->setValidator(new QRegularExpressionValidator(Utils::get()->getNameRegexValidator(), this));
 
     buttonLock = buildCheckableButton("lock/unlock presets order", ":/images/stock_lock_open_16.png", ":/images/stock_lock_16.png");
     buttonLock->setChecked(true);
@@ -210,7 +210,7 @@ bool PresetsListWidget::loadBank(QString bankName) {
 
     if (ISLOGGABLE_INFO) LOG_INFO("loading bank \"" + bankName+"\"");
 
-    if (bankName == 0 || bankName.isEmpty())
+    if (bankName.isEmpty())   /* Qt 6: a "== 0" összehasonlítás nem fordul; Qt 5-ben is az üres szövegre vizsgált */
         return false;
 
     this->bankName=bankName;
@@ -334,7 +334,7 @@ bool PresetsListWidget::newBank(QString bankName) {
 
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("Creating new bank \"" + bankName + "\"");
 
-    if (bankName == 0 || bankName.isEmpty())
+    if (bankName.isEmpty())   /* Qt 6: a "== 0" összehasonlítás nem fordul; Qt 5-ben is az üres szövegre vizsgált */
         return false;
 
     this->bankName=bankName;

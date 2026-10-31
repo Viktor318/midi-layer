@@ -16,6 +16,7 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRegularExpression>
 #include "MidiManager.h"
 
 static void midiCallback( double /*deltatime*/,
@@ -193,7 +194,7 @@ QMap<QString,int> MidiManager::getAvailableInPorts()  {
         int nPorts = (int) this->midiInDriver->getPortCount();
         if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("There are %1 sources available at MIDI input").arg(nPorts));
         for ( int i=0; i<nPorts; i++ ) {
-            portName = QString::fromStdString(this->midiInDriver->getPortName(i)).remove(QRegExp("[^a-zA-Z\\d\\s]"));
+            portName = QString::fromStdString(this->midiInDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
             if ( !isExcludedMidiPort( portName ) )  {
                 // portName.replace(QRegExp(":[0-9]+$"),"");
                 availableInPorts.insert(portName,i);
@@ -219,7 +220,7 @@ QMap<QString,int> MidiManager::getAvailableOutPorts()  {
         if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("There are %1 sources available at MIDI output").arg(nPorts));
         for ( int i=0; i<nPorts; i++ ) {
 
-            portName = QString::fromStdString(this->midiOutDriver->getPortName(i)).remove(QRegExp("[^a-zA-Z\\d\\s]"));
+            portName = QString::fromStdString(this->midiOutDriver->getPortName(i)).remove(QRegularExpression("[^a-zA-Z\\d\\s]"));
             if ( !isExcludedMidiPort( portName) )   {
                 // portName.replace(QRegExp(":[0-9]+$"),"");
                 availableOutPorts.insert(portName,i);
@@ -351,8 +352,9 @@ bool MidiManager::isExcludedMidiPort(QString portName) {
 }
 
 bool MidiManager::isAlreadyOpenPort(QString portName)    {
-    QRegExp regexp(".*(:\\d:)");
-    return (regexp.indexIn(portName) > -1);
+    // Qt 6: QRegExp -> QRegularExpression
+    QRegularExpression regexp(".*(:\\d:)");
+    return regexp.match(portName).hasMatch();
 }
 
 QString MidiManager::getInPortNameAtSlot(int slotIndex)  {

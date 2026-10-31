@@ -23,7 +23,8 @@
 #include <QMutex>
 #include <QCoreApplication>
 #include <QString>
-#include <QRegExp>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QStringList>
 #include <QList>
 #include <QFont>
@@ -74,7 +75,7 @@ public:
     void configElementStripSpinFont(QFont * font);
     void configElementStripBigFont(QFont * font);
 
-    QRegExp getNameRegexValidator();
+    QRegularExpression getNameRegexValidator();
 
     QString buildElementTabIconPath(bool isActive, bool isEdited);
 

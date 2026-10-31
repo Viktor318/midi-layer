@@ -16,6 +16,7 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRegularExpression>
 #include "ElementWidget.h"
 
 ElementWidget::ElementWidget(QWidget *parent, PresetInterface * presetInterface) :
@@ -49,7 +50,7 @@ ElementWidget::ElementWidget(QWidget *parent, PresetInterface * presetInterface)
     this->ui->sbCCHigh->setFont(fontSpinValues);
     this->ui->sbCCLow->setFont(fontSpinValues);
 
-    this->ui->lName->setValidator(new QRegExpValidator(Utils::get()->getNameRegexValidator(), this));
+    this->ui->lName->setValidator(new QRegularExpressionValidator(Utils::get()->getNameRegexValidator(), this));
 
     for (int m=0; m<MIDI_SLOTS; m++)    {
         this->ui->cbPortIn->addItem(QString("%1 - %2").arg(m+1).arg(MidiManager::get()->getInPortNameAtSlot(m)),m);
@@ -298,7 +299,7 @@ void ElementWidget::initialSysExValidation()  {
 
 QString ElementWidget::renderSystemExclusiveForSave( QString systemExclusiveOnGUI ) {
     QString renderedStr = "";
-    QStringList list = systemExclusiveOnGUI.split(" ", QString::SkipEmptyParts);
+    QStringList list = systemExclusiveOnGUI.split(" ", Qt::SkipEmptyParts);
     bool first = true;
     for (int i=0; i<list.size(); i++)    {
         if (first)
@@ -328,7 +329,7 @@ QString ElementWidget::renderControllersForSave() {
 }
 
 void ElementWidget::setControllersFromString(QString controllersStr) {
-    QStringList list = controllersStr.split(",", QString::SkipEmptyParts);
+    QStringList list = controllersStr.split(",", Qt::SkipEmptyParts);
     for (int i=0; i< list.size(); i++)  {
         QListWidgetItem *item = ui->listCtrlAvaiable->item(list.at(i).toInt());
         item->setCheckState( Qt::Checked );
@@ -767,7 +768,7 @@ QString ElementWidget::getCloneName(QString pretendedName)   {
     QStringList elementNameFilter;
     elementNameFilter.append( QString("*%1").arg(APP_DATA_ELEMENT_EXTENSION) );
     QStringList elementsFilesOnFolder = presetDir.entryList(elementNameFilter, QDir::Files | QDir::NoDotAndDotDot | QDir::Readable );
-    elementsFilesOnFolder.replaceInStrings(QRegExp(QRegExp::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
+    elementsFilesOnFolder.replaceInStrings(QRegularExpression(QRegularExpression::escape(APP_DATA_ELEMENT_EXTENSION)+"$"),"");
     return Utils::get()->getCloneName(pretendedName, elementsFilesOnFolder);
 }
 
@@ -862,7 +863,7 @@ void ElementWidget::processNoteOn(ChannelMessage channelMessage) {
                     // Apply Channel translation and send note
                     MidiManager::get()->sendNoteOn( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, (unsigned char) note, channelMessage.getByte2());
                     ledOut->flash();
-                    if (ISLOGGABLE_TRACE) LOG_TRACE( ui->lName->text()+" sendNoteOn..."+ channelMessage.getByte2());
+                    if (ISLOGGABLE_TRACE) LOG_TRACE( ui->lName->text()+" sendNoteOn..."+ QString::number(channelMessage.getByte2()));   // Qt 6: QString + unsigned char nem fordul (Qt 5-ben karakterként fűzte hozzá)
                 }
                 else    {
                     this->ledTransposeOutOfBounds->flash();
@@ -1174,7 +1175,7 @@ bool ElementWidget::loadFrom(QString fromBankName, QString fromPresetName, QStri
 
 bool ElementWidget::load(QString bankName, QString presetName, QString elementName) {
 
-    if (elementName == 0 || elementName.isEmpty())    {
+    if (elementName.isEmpty())   /* Qt 6: a "== 0" összehasonlítás nem fordul; Qt 5-ben is az üres szövegre vizsgált */    {
         if (ISLOGGABLE_ERROR) LOG_ERROR("Loading element fails. No name asigned for load.");
         return false;
     }
@@ -1337,7 +1338,7 @@ void ElementWidget::slotSetSelected()   {
 void ElementWidget::systemExclusiveTextParser(QString systemExclusiveText, std::vector<unsigned char> * buffer)  {
 
     buffer->clear();
-    QStringList textPiece = systemExclusiveText.split(' ',QString::SkipEmptyParts);
+    QStringList textPiece = systemExclusiveText.split(' ',Qt::SkipEmptyParts);
     for (int i=0; i<textPiece.count();i++)  {
         if (textPiece.at(i).length()==2 )  {
             buffer->push_back( this->hexText2uchar( textPiece.at(i)) );

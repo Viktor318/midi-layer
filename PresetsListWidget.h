@@ -24,7 +24,6 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QCheckBox>
-#include <QLinkedList>
 #include <QDir>
 #include <QFile>
 #include <QValidator>

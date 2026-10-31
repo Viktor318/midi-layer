@@ -16,11 +16,27 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QScreen>
+#include <QStyleFactory>
 #include "main.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    // Qt 6: a Windows 11-es alapstílus szélesebb fel/le gombokat rajzol a számmezőkre,
+    // és a régi (Qt 5-re tervezett) elrendezésben levágja a számokat. A Fusion stílus
+    // minden platformon egyforma, és jól illeszkedik az eredeti felülethez.
+    // A "-style <név>" parancssori argumentummal továbbra is felülbírálható.
+    bool styleGivenOnCommandLine = false;
+    for (int i = 1; i < argc; ++i) {
+        if (QString::fromLocal8Bit(argv[i]).startsWith("-style")) {
+            styleGivenOnCommandLine = true;
+            break;
+        }
+    }
+    if (!styleGivenOnCommandLine)
+        app.setStyle(QStyleFactory::create("Fusion"));
 
     // Qt Translation
     QTranslator qtTranslator;
@@ -135,18 +151,18 @@ void detectAndSetRunMode(QStringList arguments)  {
             QTextStream(stdout) << "MIDI in interfaces:" << "\n";
             QList<QString> inPorts = MidiManager::get()->getAvailableInPorts().keys();
             for (int i = 0; i < inPorts.count(); i++) {
-                QTextStream(stdout) << "-" << inPorts.at(i) << endl;
+                QTextStream(stdout) << "-" << inPorts.at(i) << Qt::endl;
             }
             QTextStream(stdout) << "MIDI out interfaces:" << "\n";
             QList<QString> outPorts = MidiManager::get()->getAvailableOutPorts().keys();
             for (int i = 0; i < outPorts.count(); i++) {
-                QTextStream(stdout) << "-" << outPorts.at(i) << endl;
+                QTextStream(stdout) << "-" << outPorts.at(i) << Qt::endl;
             }
             qApp->exit(0);
             exit(0);
         }
         else if (arguments.at(1) == "-v" || arguments.at(1) == "--version")   {
-            QTextStream(stdout) << QString("%1.%2").arg(APP_VERSION).arg(BUILD_REVISION) << endl;
+            QTextStream(stdout) << QString("%1.%2").arg(APP_VERSION).arg(BUILD_REVISION) << Qt::endl;
             qApp->exit(0);
             exit(0);
         }
@@ -218,7 +234,7 @@ void showSplashScreen(MainWindow * mainWindow) {
 
     // Show SplashScreen
     QPixmap pixmap(":/images/splashScreen.png");
-    QSplashScreen * splash = new QSplashScreen(mainWindow, pixmap);
+    QSplashScreen * splash = new QSplashScreen(pixmap);   // Qt 6: a szülő ablakot váró konstruktor megszűnt
 
     QTimer * timer = new QTimer();
     timer->setInterval(5000);
@@ -227,7 +243,7 @@ void showSplashScreen(MainWindow * mainWindow) {
     timer->start();
 
     QRect srect(0, 0, splash->width(), splash->height());
-    splash->move(qApp->desktop()->availableGeometry().center() - srect.center());
+    splash->move(QGuiApplication::primaryScreen()->availableGeometry().center() - srect.center());
     splash->show();
     splash->showMessage ( QString( "<br><br><br><br><span style=\"color: #CCC;\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version %1 - Copyright (C) 2012-2015, %3</span>")
                           .arg( QApplication::applicationVersion(),

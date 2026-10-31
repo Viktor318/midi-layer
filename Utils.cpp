@@ -57,12 +57,14 @@ QString Utils::getCloneName(QString name, QStringList existingNames) {
     QString radical = "";
 
     // Verify if 'name' is a clone
-    QRegExp regexp("(.*)\\s\\((\\d+)\\)");
-    regexp.indexIn(name);
-    QStringList captureList = regexp.capturedTexts();
+    // Qt 6: QRegExp -> QRegularExpression. Találat nélkül a capturedTexts()
+    // üres listát ad (a QRegExp üres szövegeket adott), ezert hasMatch()-csel vizsgálunk.
+    QRegularExpression regexp("(.*)\\s\\((\\d+)\\)");
+    QRegularExpressionMatch match = regexp.match(name);
+    QStringList captureList = match.capturedTexts();
 
     int maxIndex=1;
-    if (captureList.at(0).length()>0)  {
+    if (match.hasMatch() && captureList.at(0).length()>0)  {
         radical = captureList.at(1);
         maxIndex = captureList.at(2).toInt(0,10);
         if (maxIndex<1)
@@ -315,8 +317,8 @@ void Utils::configElementStripSpinFont(QFont * font)   {
     font->setStyleStrategy(QFont::PreferDefault);
 }
 
-QRegExp Utils::getNameRegexValidator()  {
-    QRegExp nameValidator("^(([a-zA-Z]:|\\\\)\\\\)?(((\\.)|(\\.\\.)|([^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?))\\\\)*[^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?$");
+QRegularExpression Utils::getNameRegexValidator()  {
+    QRegularExpression nameValidator("^(([a-zA-Z]:|\\\\)\\\\)?(((\\.)|(\\.\\.)|([^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?))\\\\)*[^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?$");
     return nameValidator;
 }
 

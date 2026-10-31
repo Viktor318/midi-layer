@@ -2248,6 +2248,7 @@ std::string RtMidiIn :: getPortName( unsigned int portNumber )
   int length = WideCharToMultiByte(CP_UTF8, 0, deviceCaps.szPname, -1, NULL, 0, NULL, NULL);
   stringName.assign( length, 0 );
   length = WideCharToMultiByte(CP_UTF8, 0, deviceCaps.szPname, wcslen(deviceCaps.szPname), &stringName[0], length, NULL, NULL);
+  stringName.resize( length );  // MidiLayer: drop the trailing NUL left by the length estimate (shown as a box after the port name on Windows)
 #else
   stringName = std::string( deviceCaps.szPname );
 #endif
@@ -2285,6 +2286,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber )
   int length = WideCharToMultiByte(CP_UTF8, 0, deviceCaps.szPname, -1, NULL, 0, NULL, NULL);
   stringName.assign( length, 0 );
   length = WideCharToMultiByte(CP_UTF8, 0, deviceCaps.szPname, wcslen(deviceCaps.szPname), &stringName[0], length, NULL, NULL);
+  stringName.resize( length );  // MidiLayer: drop the trailing NUL left by the length estimate (shown as a box after the port name on Windows)
 #else
   stringName = std::string( deviceCaps.szPname );
 #endif

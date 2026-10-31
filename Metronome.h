@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include <QList>
 #include <QFont>
+#include <QElapsedTimer>
 #include <cmath>
 
 #include "Led.h"
@@ -57,7 +58,7 @@ private:
     int tapTempoCount;
     int nextBeatTime;
     QList<int> tapTempoRecords;
-    QTime tapTempoStopwatch;
+    QElapsedTimer tapTempoStopwatch;    // Qt 6: QTime-alapú stopper helyett
     QString localHostName;
     QString currentPresetName;
 

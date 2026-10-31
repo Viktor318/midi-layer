@@ -16,6 +16,7 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRegularExpression>
 #include "InformUpdates.h"
 
 InformUpdates::InformUpdates(QObject *parent):
@@ -125,9 +126,9 @@ QList<int> InformUpdates::splitVersionNumbers(QString versionStr)  {
 
     QList<int> version;
     // Split version info
-    QRegExp regexp("\\s*(\\d+)\\.(\\d+)\\.(\\d+)(.*)\\s*");
-    regexp.indexIn(versionStr);
-    QStringList captureList = regexp.capturedTexts();
+    // Qt 6: QRegExp -> QRegularExpression (találat nélkül üres listát ad, így a méretvizsgálat kiszűri)
+    QRegularExpression regexp("\\s*(\\d+)\\.(\\d+)\\.(\\d+)(.*)\\s*");
+    QStringList captureList = regexp.match(versionStr).capturedTexts();
 
     if (captureList.size()>=4)  {
         version.append(captureList.at(1).toInt(0,10));

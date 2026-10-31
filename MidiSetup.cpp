@@ -31,10 +31,10 @@ MidiSetup::MidiSetup(QWidget *parent) :
         midiOutCombos.insert(m, new QComboBox(this));
 
         QHBoxLayout * slotHBox = new QHBoxLayout();
-        slotHBox->setMargin(2);
+        slotHBox->setContentsMargins(2, 2, 2, 2);
         slotHBox->setSpacing(8);
 
-        QLabel * slotLabel = new QLabel(QString(tr("SLOT %1")).arg(m+1),this,0);
+        QLabel * slotLabel = new QLabel(QString(tr("SLOT %1")).arg(m+1),this);   // Qt 6: a 0 nem alakítható Qt::WindowFlags-szé
         slotLabel->setAlignment(Qt::AlignCenter);
         slotHBox->addWidget(slotLabel, 1);
         slotHBox->addWidget(midiInCombos.at(m),4);

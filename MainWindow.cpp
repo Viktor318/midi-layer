@@ -16,6 +16,7 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QScreen>
 #include "MainWindow.h"
 
 MainWindow::MainWindow(QApplication */*parent*/)
@@ -308,7 +309,7 @@ void MainWindow::loadSettings(void) {
         settings.endGroup();
 
         settings.beginGroup("MainWindow");
-        this->setGeometry(settings.value("geometry", QRect((1120-qApp->desktop()->geometry().width())/2, (647-qApp->desktop()->geometry().height())/2, 1120, 647)).toRect());
+        this->setGeometry(settings.value("geometry", QRect((1120-QGuiApplication::primaryScreen()->geometry().width())/2, (647-QGuiApplication::primaryScreen()->geometry().height())/2, 1120, 647)).toRect());
         if (settings.allKeys().contains("windowState")) {
             this->restoreState(settings.value("windowState", QByteArray("\0\0\0\xff\0\0\0\0\xfd\0\0\0\x3\0\0\0\0\0\0\x1\x4\0\0\x1\xf0\xfc\x2\0\0\0\x5\xfb\0\0\0\x14\0p\0r\0\x65\0s\0\x65\0t\0\x44\0o\0\x63\0k\x1\0\0\0\\\0\0\x1\xf0\0\0\0\x96\0\xff\xff\xff\xfb\0\0\0.\0s\0\x65\0q\0u\0\x65\0n\0\x63\0\x65\0r\0\x43\0o\0n\0t\0r\0o\0l\0l\0\x65\0r\0\x44\0o\0\x63\0k\0\0\0\x2\x19\0\0\0\x33\0\0\0\x33\0\0\0\x33\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x32\x2\0\0\x3\f\0\0\0\0\0\0\x1\xf4\0\0\0\xa5\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x34\x2\0\0\x1\0\0\0\0\xbe\0\0\x4\0\0\0\0\xf0\xfb\0\0\0\x12\0p\0\x61\0n\0i\0\x63\0\x44\0o\0\x63\0k\0\0\0\x1\xda\0\0\0<\0\0\0\0\0\0\0\0\0\0\0\x2\0\0\x4\"\0\0\0\x42\xfc\x1\0\0\0\x6\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x31\x1\0\0\0\0\0\0\x1v\0\0\x1\"\0\xff\xff\xff\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x31\x1\0\0\x1|\0\0\x1\x9c\0\0\x1\"\0\xff\xff\xff\xfb\0\0\0\x1a\0m\0\x65\0t\0r\0o\0n\0o\0m\0\x65\0\x44\0o\0\x63\0k\x1\0\0\x3\x1e\0\0\x1\x4\0\0\x1\x4\0\xff\xff\xff\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x33\x2\0\0\0O\0\0\x2Q\0\0\x1$\0\0\0\x44\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x34\x2\0\0\x3\xe2\0\0\0\xcb\0\0\x1\x1e\0\0\0?\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x33\x2\0\0\x3\xa2\0\0\x1\x10\0\0\x1^\0\0\0?\0\0\0\x3\0\0\x4\"\0\0\0\x42\xfc\x1\0\0\0\x1\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x32\0\0\0\0\0\0\0\x2=\0\0\x1\"\0\xff\xff\xff\0\0\x3\x18\0\0\x1\xf0\0\0\0\x4\0\0\0\x4\0\0\0\b\0\0\0\b\xfc\0\0\0\0")).toByteArray());
         }
@@ -540,7 +541,7 @@ void MainWindow::setDefaultWidgetSettings()  {
 
     // Set widgets default config (no config file)
     this->setGeometry(0, 0, 1120, 647);
-    this->move(qApp->desktop()->geometry().center()-this->geometry().center());
+    this->move(QGuiApplication::primaryScreen()->geometry().center()-this->geometry().center());
 
     presetDock->setVisible(true);
     metronomeDock->setVisible(false);
