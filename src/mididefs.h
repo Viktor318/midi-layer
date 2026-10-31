@@ -56,6 +56,7 @@
 #define CTL_VOLUME           7
 #define CTL_PAN             10
 #define CTL_EXPRESSION      11
+#define CTL_SUSTAIN         64      // Windows fork: kitartó (damper) pedál
 #define CTL_MSB              0
 #define CTL_LSB           0x20
 #define CTL_ALL_SOUND_OFF 0x78

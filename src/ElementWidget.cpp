@@ -918,6 +918,10 @@ void ElementWidget::processNoteOn(ChannelMessage channelMessage) {
                     channelMessage.setByte1( channelMessage.getByte1()+ui->dialTranspose->value() );
                     // Apply Channel translation and send note
                     MidiManager::get()->sendNoteOn( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, (unsigned char) note, channelMessage.getByte2());
+                    // Windows fork: bejegyzés, hogy a felengedés pontosan ide menjen (a bemeneti
+                    // billentyű = a kiküldött hang a transzponálás nélkül)
+                    MidiManager::get()->registerSoundingNote( channelMessage.getSlotNumber(), channelMessage.getChannel(), note - ui->dialTranspose->value(),
+                                                              ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, note );
                     ledOut->flash();
                     // if (ISLOGGABLE_TRACE) LOG_TRACE( ui->lName->text()+" sendNoteOn..." + channelMessage.getByte2());
                 }
@@ -951,12 +955,13 @@ void ElementWidget::processNoteOff(ChannelMessage channelMessage) {
                 ledRangeMatch->flash();
         }
 
+        // Windows fork: a Note Off-ot már nem az elem küldi ki, hanem a MidiManager, a Note On-kor
+        // bejegyzett célok alapján (lásd MidiManager::slotReleaseTrackedNotes). Az eredeti megoldás
+        // az elem AKTUÁLIS beállításaival (tartomány, transzponálás, kimenet) küldte, így ha a
+        // billentyű lenyomása és felengedése között presetet váltottunk, és az új elem tartománya,
+        // transzponálása vagy kimenete eltért, a Note Off elmaradt vagy rossz helyre ment, és a
+        // hang beragadt. Itt már csak a kijelzés marad.
         if ( validRange )   {
-
-            // Apply Element transpose
-            channelMessage.setByte1( channelMessage.getByte1()+ui->dialTranspose->value() );
-            // Apply Channel translation and send note
-            MidiManager::get()->sendNoteOff( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1, channelMessage.getByte1(), channelMessage.getByte2());
             ledOut->flash();
         }
         ledNoteYes->flash();
@@ -995,6 +1000,8 @@ void ElementWidget::processChannelAftertouch(ChannelMessage channelMessage)  {
 void ElementWidget::processControlChange(ChannelMessage channelMessage)  {
 
     bool controllerAuthorized = false;
+    // Windows fork: a bejövő vezérlő száma az átalakítások előtt (a pedál-nyilvántartáshoz)
+    const unsigned char inController = channelMessage.getByte1();
 
     // Learn Volume High
     if (this->ui->buttonCCRangeHi->isChecked())    {
@@ -1065,6 +1072,14 @@ void ElementWidget::processControlChange(ChannelMessage channelMessage)  {
         }
         if (validControlChange) {
             MidiManager::get()->sendController( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,channelMessage.getByte1(), channelMessage.getByte2());
+            // Windows fork: a kitartó pedál lenyomásának bejegyzése, hogy a felengedése akkor is ide
+            // menjen, ha közben presetet váltottunk (lásd MidiManager::slotReleaseTrackedNotes).
+            // Csak akkor, ha a bejövő ÉS a kimenő vezérlő is a pedál (egy átalakítás, pl. a
+            // "convert to subvol", más vezérlővé teheti).
+            if ( inController == CTL_SUSTAIN && channelMessage.getByte1() == CTL_SUSTAIN && channelMessage.getByte2() >= 64 )  {
+                MidiManager::get()->registerSustainOn( channelMessage.getSlotNumber(), channelMessage.getChannel(),
+                                                       ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1 );
+            }
             ledOut->flash();
         }
     }

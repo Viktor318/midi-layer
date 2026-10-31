@@ -24,6 +24,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QHash>
 #include <QStringList>
 #include <QTimer>
 
@@ -101,6 +102,16 @@ public:
     int getSequencerControllerSlot();
     void setEmitSentChannelMessage(bool emitSentChannelMessage);
 
+    // Windows fork: a megszólaltatott hangok és a lenyomott kitartó pedál nyilvántartása.
+    // Az elemek a kiküldés után bejegyzik, hogy melyik bemenet (slot + csatorna + billentyű)
+    // hová szólaltatott meg hangot, illetve hová küldött pedál-lenyomást. A billentyű vagy
+    // a pedál felengedését a MidiManager ennek alapján pontosan oda küldi, ahová a lenyomás
+    // ment - az aktuális preset és elemek beállításaitól (tartomány, transzponálás, kimeneti
+    // slot / csatorna, be-/kikapcsolt állapot) függetlenül. Így preset-váltáskor sem
+    // ragadnak be hangok.
+    void registerSoundingNote(int inSlot, int inChannel, int inNote, int outSlot, int outChannel, int outNote);
+    void registerSustainOn(int inSlot, int inChannel, int outSlot, int outChannel);
+
 
 public slots:
 
@@ -115,6 +126,7 @@ private slots:
 
     void activate();
     void desactivate();
+    void slotReleaseTrackedNotes(ChannelMessage channelMessage);
 
 
 private:
@@ -157,6 +169,20 @@ private:
 //    RtMidiOut * virtualMidiOut;
 
     bool emitSentChannelMessage;
+
+    // Windows fork: a hang- és pedál-nyilvántartás (lásd registerSoundingNote)
+    struct OutTarget {
+        int slot;
+        int channel;
+        int note;       // a pedálnál nem használt
+        bool operator==(const OutTarget & other) const {
+            return slot == other.slot && channel == other.channel && note == other.note;
+        }
+    };
+    QHash<int, QList<OutTarget>> soundingNotes;     // kulcs: bemeneti slot + csatorna + billentyű
+    QHash<int, QList<OutTarget>> sustainedOutputs;  // kulcs: bemeneti slot + csatorna
+    static int trackKey(int slot, int channel, int note) { return (slot << 11) | ((channel & 0x0F) << 7) | (note & 0x7F); }
+    void clearTrackedNotes();
 
 
 signals:

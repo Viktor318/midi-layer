@@ -13,6 +13,14 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   képernyőn kívülre került. Az alapértelmezett ablak most a fő képernyő közepére
   kerül, és a mentett pozíciót csak akkor használja, ha az látszik valamelyik
   képernyőn.
+- **Hibajavítás**: Beragadó hangok preset-váltáskor. A billentyű felengedése (Note Off)
+  eddig az *új* preset elemein ment át, és ha a hang kívül esett azok tartományán, vagy
+  más volt a transzponálás vagy a kimeneti csatorna, a leállítás elmaradt vagy rossz
+  helyre ment. Most a program nyilvántartja, melyik billentyű hová szólaltatott meg
+  hangot, és a felengedést pontosan oda küldi.
+- **Hibajavítás**: Beragadó kitartó pedál preset-váltáskor. A pedál (CC64) felengedése
+  most minden olyan csatornára kimegy, ahová a lenyomása ment.
+- Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).
 - Az adományozásra felhívó gomb helyén a „Windows fork by Viktor318” link.

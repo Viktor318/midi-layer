@@ -12,6 +12,14 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: On first start (without a saved window position) the main window was
   placed off screen. The default window is now centered on the primary screen, and
   a saved position is used only if it is visible on one of the screens.
+- **Bugfix**: Stuck notes after a preset change. The key release (Note Off) used to pass
+  through the elements of the *new* preset, and if the note was outside their range, or
+  the transpose or output channel differed, the note off was dropped or went to the
+  wrong place. The program now records where each key sounded a note, and sends the
+  release exactly there.
+- **Bugfix**: Stuck sustain pedal after a preset change. The pedal (CC64) release is now
+  sent to every channel the pedal press was sent to.
+- On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
 - The donation button is replaced by a "Windows fork by Viktor318" link.

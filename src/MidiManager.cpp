@@ -153,6 +153,12 @@ void MidiManager::init()  {
     // Need register a <T> for use in Signals & Slots
     qRegisterMetaType<ChannelMessage>("ChannelMessage");
 
+    // Windows fork: a billentyű- és pedál-felengedések a nyilvántartás alapján mennek ki.
+    // FONTOS: a jelet az RtMidi saját szálán bocsátjuk ki, a feldolgozás pedig sorba
+    // állítva, a felület szálán fut - ugyanabban a sorban, mint az elemek feldolgozása.
+    // Így egy felengedés soha nem előzheti meg a hozzá tartozó lenyomás bejegyzését.
+    connect(this, SIGNAL(receivedChannelMessage(ChannelMessage)), this, SLOT(slotReleaseTrackedNotes(ChannelMessage)));
+
     for (int i=0; i<MIDI_SLOTS; i++)    {
 
         midiInList.append(0);
@@ -717,6 +723,8 @@ void MidiManager::sendMessageWrapper(int slotIndex, std::vector<unsigned char> *
 void MidiManager::slotPanic()   {
     if (ISLOGGABLE_INFO) LOG_INFO("Send PANIC!");
     this->desactivate();
+    // Windows fork: a pánik minden hangot leállít, a nyilvántartás így érvényét veszti
+    this->clearTrackedNotes();
     for (int slotIndex=0; slotIndex<MIDI_SLOTS; slotIndex++)    {
         for (int channel=0; channel<16; channel++)    {
             allNotesOff(slotIndex, channel);
@@ -752,6 +760,55 @@ void MidiManager::resetAllControllers() {
     for (int slot=0; slot<MIDI_SLOTS; slot++)    {
         this->resetAllControllers(slot);
     }
+}
+
+
+// ####### Windows fork: megszólaltatott hangok és kitartó pedál nyilvántartása
+
+void MidiManager::registerSoundingNote(int inSlot, int inChannel, int inNote, int outSlot, int outChannel, int outNote)    {
+    OutTarget target = { outSlot, outChannel, outNote };
+    QList<OutTarget> & targets = soundingNotes[trackKey(inSlot, inChannel, inNote)];
+    if (!targets.contains(target))
+        targets.append(target);
+}
+
+
+void MidiManager::registerSustainOn(int inSlot, int inChannel, int outSlot, int outChannel)    {
+    OutTarget target = { outSlot, outChannel, 0 };
+    QList<OutTarget> & targets = sustainedOutputs[trackKey(inSlot, inChannel, 0)];
+    if (!targets.contains(target))
+        targets.append(target);
+}
+
+
+void MidiManager::slotReleaseTrackedNotes(ChannelMessage channelMessage)   {
+
+    unsigned char status = channelMessage.getStatus();
+
+    // Billentyű felengedése: Note Off, vagy 0-s velocityjű Note On (a régi MIDI-szokás szerint)
+    if ( status == STATUS_NOTEOFF || (status == STATUS_NOTEON && channelMessage.getByte2() == 0) )  {
+        int key = trackKey(channelMessage.getSlotNumber(), channelMessage.getChannel(), channelMessage.getByte1());
+        QList<OutTarget> targets = soundingNotes.take(key);
+        for (const OutTarget & target : targets)   {
+            sendNoteOff(target.slot, target.channel, target.note, channelMessage.getByte2());
+        }
+        return;
+    }
+
+    // Kitartó pedál (CC64) felengedése: 64 alatti érték
+    if ( status == STATUS_CTLCHG && channelMessage.getByte1() == CTL_SUSTAIN && channelMessage.getByte2() < 64 )  {
+        int key = trackKey(channelMessage.getSlotNumber(), channelMessage.getChannel(), 0);
+        QList<OutTarget> targets = sustainedOutputs.take(key);
+        for (const OutTarget & target : targets)   {
+            sendController(target.slot, target.channel, CTL_SUSTAIN, 0);
+        }
+    }
+}
+
+
+void MidiManager::clearTrackedNotes()   {
+    soundingNotes.clear();
+    sustainedOutputs.clear();
 }
 
 
