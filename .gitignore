@@ -17,3 +17,6 @@ Makefile*
 moc_*.cpp
 ui_*.h
 qrc_*.cpp
+
+# A deploy.bat kimenete (release-csomagok)
+/deploy/
