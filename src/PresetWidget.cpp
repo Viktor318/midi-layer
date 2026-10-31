@@ -59,6 +59,7 @@ PresetWidget::PresetWidget(QWidget *parent) :
     buttonRevert->setIconSize(QSize(24, 28));
     buttonRevert->setChecked(false);
     buttonRevert->setToolTip("revert preset");
+    buttonRevert->setFixedSize(28, 28);     // Windows fork: ugyanakkora, mint az elem soráé (Element.ui)
     buttonSave = new QPushButton(this);
     QIcon icon3;
     icon3.addFile(QString::fromUtf8(":/images/save.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -66,6 +67,7 @@ PresetWidget::PresetWidget(QWidget *parent) :
     buttonSave->setIconSize(QSize(24, 28));
     buttonSave->setChecked(false);
     buttonSave->setToolTip("save preset");
+    buttonSave->setFixedSize(28, 28);       // Windows fork: ugyanakkora, mint az elem soráé (Element.ui)
     this->setEdited(false);
 
     buttonOverview = new QPushButton(this);
@@ -83,13 +85,18 @@ PresetWidget::PresetWidget(QWidget *parent) :
     QHBoxLayout * hBoxHeader = new QHBoxLayout();
     hBoxHeader->setSpacing(4);
     hBoxHeader->addSpacing(6);
-    hBoxHeader->addWidget(pcLabel, 10, Qt::AlignLeft);
+    // Windows fork: a programszám, a névmező és a visszavonás / mentés gomb nyújtás (stretch)
+    // nélkül, szorosan egymás után következik, ugyanazokkal a térközökkel, mint az elem sorában
+    // (Element.ui: név, 10 px, visszavonás, 7 px, mentés). Az eredeti elrendezésben ezek is
+    // kaptak a szabad helyből, ezért a gombok a névmezőtől távol, a rendelkezésre álló hely
+    // közepén jelentek meg. A szabad helyet most egyedül az utánuk következő nyújtás veszi fel.
+    hBoxHeader->addWidget(pcLabel, 0, Qt::AlignLeft);
     hBoxHeader->addSpacing(5);
-    hBoxHeader->addWidget(nameEdit, 90, Qt::AlignLeft);
-    hBoxHeader->addSpacing(10);
-    hBoxHeader->addWidget(buttonRevert, 10, Qt::AlignCenter);
-    hBoxHeader->addSpacing(7);
-    hBoxHeader->addWidget(buttonSave, 10, Qt::AlignCenter);
+    hBoxHeader->addWidget(nameEdit, 0, Qt::AlignLeft);
+    hBoxHeader->addSpacing(10 - hBoxHeader->spacing());
+    hBoxHeader->addWidget(buttonRevert, 0, Qt::AlignVCenter);
+    hBoxHeader->addSpacing(7 - hBoxHeader->spacing());
+    hBoxHeader->addWidget(buttonSave, 0, Qt::AlignVCenter);
     hBoxHeader->addStretch(24);
     // Windows fork: az eredeti szerző adományozásra felhívó gombja helyett (a cím már nem
     // aktuális) a fork visszafogott, kattintható felirata.
@@ -113,6 +120,7 @@ PresetWidget::PresetWidget(QWidget *parent) :
     connect (this->nameEdit, SIGNAL(editingFinished()), this, SLOT( slotNameChanged() ) );
     // Windows fork: a mentés gomb már gépelés közben megjelenik, nem csak a mező elhagyásakor
     connect (this->nameEdit, SIGNAL(textEdited(QString)), this, SLOT( slotNameEdited(QString) ) );
+    this->nameEdit->installEventFilter(this);
 
     connect (buttonRevert, SIGNAL(released()), this, SLOT( slotRevert() ) );
     connect (buttonSave, SIGNAL(released()), this, SLOT( slotSave() ) );
@@ -403,9 +411,37 @@ LinkButton * PresetWidget::buildForkButton()   {
 // (slotNameChanged). Ha a mentés gombra kattintunk, a mező előbb elveszti a fókuszt, így az
 // átnevezés a mentés előtt lefut.
 void PresetWidget::slotNameEdited(const QString & text)   {
+    // akkor is, ha a név (még) érvénytelen, pl. a végén szóköz van - lásd eventFilter
     if (text != this->presetName) {
         this->setEdited(true);
     }
+}
+
+
+// Windows fork: a névmezőhöz tartozó érvényesítő (getNameRegexValidator) nem enged a név
+// elején és végén szóközt és pontot, mert a névből mappa- és fájlnév lesz. Ilyen
+// "félkész" szövegnél a QLineEdit a mező elhagyásakor / Enterre nem küld editingFinished
+// jelet, így az átnevezés eredetileg csendben elmaradt, a hibás szöveg pedig a mezőben maradt.
+// Most a mező elhagyásakor és Enterre ezeket levágjuk (Utils::cleanName), a helyes nevet
+// visszaírjuk a mezőbe, és elvégezzük az átnevezést. Ha a név így sem érvényes (pl. üres
+// maradt, vagy tiltott karaktert tartalmaz), a mentett név áll vissza.
+bool PresetWidget::eventFilter(QObject * watched, QEvent * event)  {
+    if ( watched == this->nameEdit && ( event->type() == QEvent::FocusOut
+        || ( event->type() == QEvent::KeyPress
+             && ( static_cast<QKeyEvent *>(event)->key() == Qt::Key_Return
+                  || static_cast<QKeyEvent *>(event)->key() == Qt::Key_Enter ) ) )
+         && !this->nameEdit->hasAcceptableInput() )  {
+        QString trimmedName = Utils::get()->cleanName(this->nameEdit->text());
+        this->nameEdit->setText(trimmedName);
+        if (this->nameEdit->hasAcceptableInput())  {
+            // a levágott név érvényes: átnevezés (az editingFinished ilyenkor nem biztos,
+            // hogy jön; a slotNameChanged ismételt hívása ártalmatlan)
+            this->slotNameChanged();
+        } else  {
+            this->nameEdit->setText(this->presetName);
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 

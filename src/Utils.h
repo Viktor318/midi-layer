@@ -75,6 +75,7 @@ public:
     void configElementStripBigFont(QFont * font);
 
     QRegularExpression getNameRegexValidator();
+    QString cleanName(QString name);    // Windows fork: szóközök és pontok levágása a név elejéről és végéről
 
     QString buildElementTabIconPath(bool isActive, bool isEdited);
 

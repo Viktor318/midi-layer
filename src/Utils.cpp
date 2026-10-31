@@ -334,6 +334,23 @@ void Utils::configElementStripSpinFont(QFont * font)   {
 }
 
 
+// Windows fork: a bank-, preset- és elemnév elejéről és végéről levágja a szóközöket és a
+// pontokat. A névből mappa- és fájlnév lesz: a Windows a név végéről csendben elhagyja a
+// pontot és a szóközt (így a név és a valódi mappa eltérne), Linuxon és macOS-en pedig a
+// ponttal kezdődő név rejtett lenne. Ezért ezeket a getNameRegexValidator sem engedi; a
+// felhasználónak viszont nem egyértelmű ez a szabály, így a program maga teszi rendbe a nevet.
+// A név belsejében a szóköz és a pont továbbra is megengedett.
+QString Utils::cleanName(QString name)  {
+    int start = 0;
+    int end = name.length();
+    while (start < end && (name.at(start).isSpace() || name.at(start) == QChar('.')))
+        start++;
+    while (end > start && (name.at(end-1).isSpace() || name.at(end-1) == QChar('.')))
+        end--;
+    return name.mid(start, end - start);
+}
+
+
 QRegularExpression Utils::getNameRegexValidator()  {
     QRegularExpression nameValidator("^(([a-zA-Z]:|\\\\)\\\\)?(((\\.)|(\\.\\.)|([^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?))\\\\)*[^\\\\/:\\*\\?""\\|<>\\. ](([^\\\\/:\\*\\?""\\|<>\\. ])|([^\\\\/:\\*\\?""\\|<>]*[^\\\\/:\\*\\?""\\|<>\\. ]))?$");
     return nameValidator;

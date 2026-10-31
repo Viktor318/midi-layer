@@ -30,6 +30,8 @@
 #include <QList>
 #include <QDir>
 #include <QFile>
+#include <QEvent>
+#include <QKeyEvent>
 
 #include "PresetInterface.h"
 
@@ -77,6 +79,10 @@ public:
 
     void popup(QString message);
 
+
+protected:
+    // Windows fork: a névmező fókuszvesztésének figyelése (érvénytelen név visszaállítása)
+    bool eventFilter(QObject * watched, QEvent * event) override;
 
 private:
 

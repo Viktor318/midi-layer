@@ -160,6 +160,7 @@ void ElementWidget::setupGuiConnections()  {
     connect(ui->lName, SIGNAL(editingFinished()), this, SLOT(slotNameChanged()) );
     // Windows fork: a mentés gomb már gépelés közben megjelenik, nem csak a mező elhagyásakor
     connect(ui->lName, SIGNAL(textEdited(QString)), this, SLOT(slotNameEdited(QString)) );
+    ui->lName->installEventFilter(this);
     connect(this->ui->buttonRevert, SIGNAL(released()), this, SLOT(slotRevert()));
     connect(this->ui->buttonSave, SIGNAL(released()), this, SLOT(slotSave()));
 
@@ -809,11 +810,39 @@ void ElementWidget::slotOctaveUp()    {
 // (slotNameChanged), illetve mentéskor (renameIfNedded) történik. Ha a mentés gombra
 // kattintunk, a mező előbb elveszti a fókuszt, így a slotNameChanged a mentés előtt lefut.
 void ElementWidget::slotNameEdited(const QString & text)   {
+    // akkor is, ha a név (még) érvénytelen, pl. a végén szóköz van - lásd eventFilter
     if (text != this->elementName) {
         this->slotMarkEdited();
         // ugyanaz, mint a slotNameChanged-ben: mentéskor a preset elemlistája is frissüljön
         this->savePresetOnSave = true;
     }
+}
+
+
+// Windows fork: a névmezőhöz tartozó érvényesítő (getNameRegexValidator) nem enged a név
+// elején és végén szóközt és pontot, mert a névből mappa- és fájlnév lesz. Ilyen
+// "félkész" szövegnél a QLineEdit a mező elhagyásakor / Enterre nem küld editingFinished
+// jelet, így az átnevezés eredetileg csendben elmaradt, a hibás szöveg pedig a mezőben maradt.
+// Most a mező elhagyásakor és Enterre ezeket levágjuk (Utils::cleanName), a helyes nevet
+// visszaírjuk a mezőbe, és elvégezzük az átnevezést. Ha a név így sem érvényes (pl. üres
+// maradt, vagy tiltott karaktert tartalmaz), a mentett név áll vissza.
+bool ElementWidget::eventFilter(QObject * watched, QEvent * event)  {
+    if ( watched == ui->lName && ( event->type() == QEvent::FocusOut
+        || ( event->type() == QEvent::KeyPress
+             && ( static_cast<QKeyEvent *>(event)->key() == Qt::Key_Return
+                  || static_cast<QKeyEvent *>(event)->key() == Qt::Key_Enter ) ) )
+         && !ui->lName->hasAcceptableInput() )  {
+        QString trimmedName = Utils::get()->cleanName(ui->lName->text());
+        ui->lName->setText(trimmedName);
+        if (ui->lName->hasAcceptableInput())  {
+            // a levágott név érvényes: a szokásos névváltozás-kezelés (az editingFinished
+            // ilyenkor nem biztos, hogy jön; a slotNameChanged ismételt hívása ártalmatlan)
+            this->slotNameChanged();
+        } else  {
+            ui->lName->setText(this->elementName);
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 

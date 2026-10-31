@@ -24,6 +24,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QDir>
 #include <QFile>
+#include <QEvent>
+#include <QKeyEvent>
 #include <QSettings>
 #include <QStringList>
 
@@ -72,6 +74,10 @@ public:
     bool isActive();
 
     Ui::ElementUI *ui;
+
+protected:
+    // Windows fork: a névmező fókuszvesztésének figyelése (érvénytelen név visszaállítása)
+    bool eventFilter(QObject * watched, QEvent * event) override;
 
 private:
 
