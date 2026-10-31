@@ -40,6 +40,12 @@ make
 This repository was imported from the project's original SourceForge SVN source:
 https://sourceforge.net/projects/midi-layer/
 
+The imported source is the original author's version 1.0.0; the author marked
+SVN revision 89 for the Windows and Mac builds (`midiLayer.pro`). The original
+development has not continued since 2016, so this fork is not automatically
+synchronized with the SourceForge repository. Should any new change appear there,
+it can be merged manually.
+
 ## License
 
 GNU General Public License v3.0 (GPLv3). See the `LICENSE` file.

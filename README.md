@@ -40,6 +40,12 @@ make
 Ez a repó a projekt eredeti SourceForge SVN forráskódjából lett importálva:
 https://sourceforge.net/projects/midi-layer/
 
+Az importált forrás az eredeti szerző 1.0.0-s verziója; a szerző a Windows- és
+Mac-buildekhez a 89-es SVN-revíziót jelölte meg (`midiLayer.pro`). Az eredeti
+fejlesztés 2016 óta nem folytatódott, ezért a fork nem szinkronizál automatikusan
+a SourceForge-tárolóval. Ha ott mégis új változás jelenne meg, azt kézzel lehet
+átvenni.
+
 ## Licenc
 
 GNU General Public License v3.0 (GPLv3). Lásd a `LICENSE` fájlt.
