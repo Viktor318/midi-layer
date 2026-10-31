@@ -184,6 +184,10 @@ void MidiManager::init()  {
     // this->midiInDriver->openVirtualPort();
     // this->midiOutDriver->openVirtualPort();
 
+    // Windows fork: a Windows MM MIDI API nem tud virtuális portot nyitni (az RtMidi ilyenkor
+    // csak egy figyelmeztetést ír ki portonként), ezért Windowson a virtuális portokat
+    // létre sem hozzuk. A virtualInPorts/virtualOutPorts listát máshol nem használja a program.
+#ifndef __WINDOWS_MM__
     QString vInPrefixName = QString(STR_VIRTUAL_IN);
     QString vOutPrefixName = QString(STR_VIRTUAL_OUT);
 
@@ -195,6 +199,7 @@ void MidiManager::init()  {
         virtualOutPorts.append(new RtMidiOut(QString("%1%2").arg(vOutPrefixName).arg(i+1).toStdString()));
         virtualOutPorts.at(i)->openVirtualPort();
     }
+#endif
 
     LOG_INFO("Initializing MIDI. Completed.");
     this->refresh();

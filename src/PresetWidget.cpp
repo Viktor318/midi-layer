@@ -91,8 +91,10 @@ PresetWidget::PresetWidget(QWidget *parent) :
     hBoxHeader->addSpacing(7);
     hBoxHeader->addWidget(buttonSave, 10, Qt::AlignCenter);
     hBoxHeader->addStretch(24);
-    donateButton = buildDonateButton();
-    hBoxHeader->addWidget(donateButton, 10, Qt::AlignRight);
+    // Windows fork: az eredeti szerző adományozásra felhívó gombja helyett (a cím már nem
+    // aktuális) a fork visszafogott, kattintható felirata.
+    forkButton = buildForkButton();
+    hBoxHeader->addWidget(forkButton, 10, Qt::AlignRight);
     hBoxHeader->addSpacing(4);
     hBoxHeader->addWidget(buttonOverview, 10, Qt::AlignRight);
     hBoxHeader->addSpacing(4);
@@ -382,16 +384,14 @@ QPushButton * PresetWidget::buildActionButton(QString toolTip, QString resourceN
 }
 
 
-LinkButton * PresetWidget::buildDonateButton()   {
+LinkButton * PresetWidget::buildForkButton()   {
     LinkButton * button = new LinkButton(this);
-    button->setMaximumWidth(250);
-    button->setMinimumWidth(250);
     button->setMaximumHeight(26);
     button->setCursor(QCursor(Qt::PointingHandCursor));
-    button->setText("please donate to midilayer@gmail.com");
-    button->setStyleSheet("background-color: #F781F3; color: #444444; border-radius: 3px;");
-    button->setToolTip(QString("If you find this program useful, please help us improve it. Say what you like to see in %1.").arg(APP_NAME));
-    button->setUrl(DONATE_URL);
+    button->setText(FORK_TEXT);
+    button->setStyleSheet("background-color: transparent; color: #808080; border: none;");
+    button->setToolTip(QString("%1 a GitHubon: %2").arg(APP_NAME).arg(FORK_URL));
+    button->setUrl(FORK_URL);
     return button;
 }
 

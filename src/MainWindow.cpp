@@ -17,6 +17,7 @@
 */
 
 #include "MainWindow.h"
+#include <QScreen>
 
 
 MainWindow::MainWindow(QApplication */*parent*/)
@@ -315,7 +316,24 @@ void MainWindow::loadSettings(void) {
         settings.endGroup();
 
         settings.beginGroup("MainWindow");
-        this->setGeometry(settings.value("geometry", QRect((1320-qApp->screens().at(0)->geometry().width())/2, (847-qApp->screens().at(0)->geometry().height())/2, 1320, 847)).toRect());
+        // Windows fork: az eredeti alapértelmezett pozíció képlete fordított volt
+        // ((ablakszélesség - képernyőszélesség) / 2), ami nagyobb képernyőn negatív, azaz
+        // képernyőn kívüli koordinátát adott. Az alapértelmezett ablak most a fő képernyő
+        // közepére kerül (legfeljebb a képernyő méretében), és a mentett pozíciót is csak
+        // akkor használjuk, ha annak legalább egy része látszik valamelyik képernyőn.
+        QRect screenRect = QGuiApplication::primaryScreen()->availableGeometry();
+        QRect defaultRect(0, 0, qMin(1320, screenRect.width()), qMin(847, screenRect.height()));
+        defaultRect.moveCenter(screenRect.center());
+        QRect savedRect = settings.value("geometry", defaultRect).toRect();
+        bool savedRectVisible = false;
+        for (QScreen * screen : QGuiApplication::screens()) {
+            QRect visiblePart = screen->availableGeometry().intersected(savedRect);
+            if (visiblePart.width() >= 200 && visiblePart.height() >= 100) {
+                savedRectVisible = true;
+                break;
+            }
+        }
+        this->setGeometry(savedRectVisible ? savedRect : defaultRect);
         if (settings.allKeys().contains("windowState")) {
             this->restoreState(settings.value("windowState", QByteArray("\0\0\0\xff\0\0\0\0\xfd\0\0\0\x3\0\0\0\0\0\0\x1\x4\0\0\x1\xf0\xfc\x2\0\0\0\x5\xfb\0\0\0\x14\0p\0r\0\x65\0s\0\x65\0t\0\x44\0o\0\x63\0k\x1\0\0\0\\\0\0\x1\xf0\0\0\0\x96\0\xff\xff\xff\xfb\0\0\0.\0s\0\x65\0q\0u\0\x65\0n\0\x63\0\x65\0r\0\x43\0o\0n\0t\0r\0o\0l\0l\0\x65\0r\0\x44\0o\0\x63\0k\0\0\0\x2\x19\0\0\0\x33\0\0\0\x33\0\0\0\x33\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x32\x2\0\0\x3\f\0\0\0\0\0\0\x1\xf4\0\0\0\xa5\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x34\x2\0\0\x1\0\0\0\0\xbe\0\0\x4\0\0\0\0\xf0\xfb\0\0\0\x12\0p\0\x61\0n\0i\0\x63\0\x44\0o\0\x63\0k\0\0\0\x1\xda\0\0\0<\0\0\0\0\0\0\0\0\0\0\0\x2\0\0\x4\"\0\0\0\x42\xfc\x1\0\0\0\x6\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x31\x1\0\0\0\0\0\0\x1v\0\0\x1\"\0\xff\xff\xff\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x31\x1\0\0\x1|\0\0\x1\x9c\0\0\x1\"\0\xff\xff\xff\xfb\0\0\0\x1a\0m\0\x65\0t\0r\0o\0n\0o\0m\0\x65\0\x44\0o\0\x63\0k\x1\0\0\x3\x1e\0\0\x1\x4\0\0\x1\x4\0\xff\xff\xff\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x33\x2\0\0\0O\0\0\x2Q\0\0\x1$\0\0\0\x44\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x34\x2\0\0\x3\xe2\0\0\0\xcb\0\0\x1\x1e\0\0\0?\xfb\0\0\0&\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0O\0u\0t\0\x33\x2\0\0\x3\xa2\0\0\x1\x10\0\0\x1^\0\0\0?\0\0\0\x3\0\0\x4\"\0\0\0\x42\xfc\x1\0\0\0\x1\xfb\0\0\0$\0m\0o\0n\0i\0t\0o\0r\0\x41\0\x63\0t\0i\0v\0i\0t\0y\0I\0n\0\x32\0\0\0\0\0\0\0\x2=\0\0\x1\"\0\xff\xff\xff\0\0\x3\x18\0\0\x1\xf0\0\0\0\x4\0\0\0\x4\0\0\0\b\0\0\0\b\xfc\0\0\0\0")).toByteArray());
         }

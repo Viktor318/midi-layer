@@ -174,7 +174,7 @@ macx {
     DEFINES+=__MACOSX_CORE__
     DEFINES+=__UNIX_JACK__
     LIBS+=-framework CoreMidi -framework CoreAudio -framework CoreFoundation
-    ICON = dist/MidiLayer.icns
+    ICON = ../dist/MidiLayer.icns
     DEFINES += BUILD_OS=\\\"Mac\\\"
     CONFIG += app_bundle
 }
@@ -197,6 +197,6 @@ RESOURCES += resources.qrc
 #TRANSLATIONS = midiLayer_pt_PT.ts
 
 OTHER_FILES += \
-    dist/readme.txt \
-    dist/midiLayer.ini \
-    dist/midiLayer.ip
+    ../dist/readme.txt \
+    ../dist/midiLayer.ini \
+    ../dist/midiLayer.ip

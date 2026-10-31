@@ -16,12 +16,27 @@
     with this program; If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QStyleFactory>
 #include "main.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    // Windows fork: a Qt 6 Windows 11-es alapstílusa szélesebb fel/le gombokat rajzol a
+    // számmezőkre, és az eredeti elrendezésben levágja a számokat. A Fusion stílus minden
+    // platformon egyforma, és jól illeszkedik az eredeti felülethez.
+    // A "-style <név>" parancssori argumentummal továbbra is felülbírálható.
+    bool styleGivenOnCommandLine = false;
+    for (int i = 1; i < argc; ++i) {
+        if (QString::fromLocal8Bit(argv[i]).startsWith("-style")) {
+            styleGivenOnCommandLine = true;
+            break;
+        }
+    }
+    if (!styleGivenOnCommandLine)
+        app.setStyle(QStyleFactory::create("Fusion"));
 
     // Qt Translation
     QTranslator qtTranslator;

@@ -121,8 +121,8 @@ private:
     void setEdited(bool edited);
     bool edited;
 
-    LinkButton * donateButton;
-    LinkButton * buildDonateButton();
+    LinkButton * forkButton;
+    LinkButton * buildForkButton();
 
 private slots:
 
