@@ -346,6 +346,12 @@ void MidiManager::closeAndDeleteInPortAtSlot(int slotIndex)   {
 }
 
 
+// Windows fork: van-e megnyitott kimeneti port a megadott sloton
+bool MidiManager::isOutSlotOpen(int slotIndex)  {
+    return slotIndex >= 0 && slotIndex < midiOutList.count() && midiOutList.at(slotIndex) != 0;
+}
+
+
 void MidiManager::setMidiOutSelected(int slotIndex, QString portName)   {
 
     if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Required config OUT slot %1 with interface %2").arg(slotIndex).arg(portName));

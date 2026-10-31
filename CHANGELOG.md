@@ -20,6 +20,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   hangot, és a felengedést pontosan oda küldi.
 - **Hibajavítás**: Beragadó kitartó pedál preset-váltáskor. A pedál (CC64) felengedése
   most minden olyan csatornára kimegy, ahová a lenyomása ment.
+- **Hibajavítás**: Ha a program beállított MIDI-kimenet nélkül indult, és a kimenetet
+  utólag választottuk ki, az aktív preset hangszer-beállításai (SysEx, bank, program,
+  hangerő) nem jutottak el a szintihez, és minden az alap hangszínen szólt a következő
+  preset-váltásig. Most a kimeneti port megnyitásakor ezek újra kimennek.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

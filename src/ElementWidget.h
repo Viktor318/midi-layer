@@ -66,6 +66,7 @@ public:
 
     void selectElement();
     void unselectElement();
+    void sendSelectMessages();      // Windows fork: a kiválasztáskor küldött beállító üzenetek
     bool loadFrom(QString fromBankName, QString fromPresetName, QString fromElementName, QString bankName, QString presetName, QString elementName);
     bool isEdited();
     bool isActive();

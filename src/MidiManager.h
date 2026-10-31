@@ -59,6 +59,7 @@ public:
     void setMidiInSelected(int slotIndex, QString portName);
     QString getInPortNameAtSlot(int slotIndex);
     QString getOutPortNameAtSlot(int slotIndex);
+    bool isOutSlotOpen(int slotIndex);      // Windows fork: van-e megnyitott kimeneti port a sloton
     QString toString();
     bool metronomeActive;
     int metronomeBpm;

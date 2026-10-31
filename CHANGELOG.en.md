@@ -19,6 +19,10 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   release exactly there.
 - **Bugfix**: Stuck sustain pedal after a preset change. The pedal (CC64) release is now
   sent to every channel the pedal press was sent to.
+- **Bugfix**: If the program started without a configured MIDI output and the output was
+  selected afterwards, the instrument settings of the active preset (SysEx, bank,
+  program, volume) never reached the synth, and everything played with the default
+  sound until the next preset change. They are now resent when the output port opens.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

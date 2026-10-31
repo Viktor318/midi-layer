@@ -242,16 +242,7 @@ void ElementWidget::setupGuiConnections()  {
 void ElementWidget::selectElement()   {
     if (!this->active)  {
         if (ui->buttonEnable->isChecked())  {
-
-            // Send system exclusive
-            if ( ui->groupBoxSendSystemExclusive->isChecked() && this->systemExclusiveOnSelect.size()>0 ) {
-                MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnSelect );
-                // Set a delay before send Bank Change and Program Change
-                // Prevents some equipment problems
-                QTimer::singleShot(50,this,SLOT(deleyedSelectElement()));
-            } else  {
-                this->deleyedSelectElement();
-            }
+            this->sendSelectMessages();
         }
 
         connect(MidiManager::get(), SIGNAL(receivedChannelMessage(ChannelMessage)), this, SLOT(slotProcessMidiMessage(ChannelMessage)));
@@ -259,6 +250,24 @@ void ElementWidget::selectElement()   {
         this->active = true;
 
         if (ISLOGGABLE_TRACE) LOG_TRACE("Turn element ON  \""+ bankName+"/"+presetName+"/"+elementName+"\"");
+    }
+}
+
+
+// Windows fork: a kiválasztáskor küldött beállító üzenetek (SysEx, majd Bank Select, Program
+// Change, hangerő) külön függvényben, hogy a kimeneti port utólagos beállításakor
+// (slotRefreshSlots) is újra ki lehessen küldeni őket. A tartalom változatlanul az eredeti
+// selectElement()-ből származik.
+void ElementWidget::sendSelectMessages()   {
+
+    // Send system exclusive
+    if ( ui->groupBoxSendSystemExclusive->isChecked() && this->systemExclusiveOnSelect.size()>0 ) {
+        MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnSelect );
+        // Set a delay before send Bank Change and Program Change
+        // Prevents some equipment problems
+        QTimer::singleShot(50,this,SLOT(deleyedSelectElement()));
+    } else  {
+        this->deleyedSelectElement();
     }
 }
 
@@ -766,6 +775,17 @@ void ElementWidget::slotRefreshSlots(int inOrOut, int slotIndex)   {
         this->ui->cbPortIn->setItemText(slotIndex, QString("%1 - %2").arg(slotIndex+1).arg(MidiManager::get()->getInPortNameAtSlot(slotIndex)));
     } else  {
         this->ui->cbPortOut->setItemText(slotIndex, QString("%1 - %2").arg(slotIndex+1).arg(MidiManager::get()->getOutPortNameAtSlot(slotIndex)));
+
+        // Windows fork: ha az aktív elem kimeneti portja most nyílt meg (vagy nyílt meg újra), a
+        // kiválasztáskor küldött beállításokat (hangszín, bank, hangerő, SysEx) újra ki kell
+        // küldeni. Eredetileg ezek csak a kiválasztás pillanatában mentek ki; ha a program
+        // beállított kimenet nélkül indult, és a portot utólag választottuk ki, a hangszer-
+        // beállítások soha nem jutottak el a szintihez, és minden az alap hangszínen szólt.
+        if ( this->active && ui->buttonEnable->isChecked()
+             && slotIndex == ui->cbPortOut->currentIndex()
+             && MidiManager::get()->isOutSlotOpen(slotIndex) )  {
+            this->sendSelectMessages();
+        }
     }
 }
 
