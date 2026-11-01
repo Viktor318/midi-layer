@@ -109,6 +109,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: If two elements of a preset sent the same key to the same output, channel and
   note, two Note Ons were sent but only one Note Off on release; on some instruments a note
   kept sounding. Two Note Offs are sent in this case now.
+- **Bugfix**: For a new element the note range labels showed "C-1" / "G9" (the UI default
+  text), while loaded elements showed the program's own naming, "C-2" / "G8". New elements
+  now use the program's naming too.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

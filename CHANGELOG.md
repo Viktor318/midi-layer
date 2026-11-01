@@ -107,6 +107,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - **Hibajavítás**: Ha egy presetben két elem ugyanazt a billentyűt ugyanarra a kimenetre,
   csatornára és hangra küldte, két Note On ment ki, de a felengedéskor csak egy Note Off;
   egyes hangszereken így egy hang szólva maradt. Most ilyenkor két Note Off megy ki.
+- **Hibajavítás**: Új elemnél a hangtartomány feliratai „C-1” / „G9” voltak (a felület
+  alapszövege), a betöltött elemeknél viszont a program saját elnevezése szerinti
+  „C-2” / „G8”. Most új elemnél is a program elnevezése látszik.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

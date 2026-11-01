@@ -92,6 +92,12 @@ ElementWidget::ElementWidget(QWidget *parent, PresetInterface * presetInterface)
 
     this->buildAndAsignLeds();
 
+    // Windows fork: a hangtartomány feliratai a program saját hangelnevezésével (NoteUtil, a 0-s hang
+    // C-2). Eddig egy új elemnél a .ui alapszövege ("C-1" / "G9") maradt, amíg a csúszkát meg
+    // nem mozdították; a betöltött elemeknél viszont már a számolt nevek ("C-2" / "G8") álltak.
+    ui->kbDown->setText(NoteUtil::get()->getNoteName(127 - ui->hsRangeDown->value()));
+    ui->kbUp->setText(NoteUtil::get()->getNoteName(ui->hsRangeUp->value()));
+
     this->ui->listCtrlAvaiable->setAlternatingRowColors(true);
 
     this->active = false;
