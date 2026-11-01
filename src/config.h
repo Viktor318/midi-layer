@@ -29,7 +29,9 @@
 #define APP_DATA_PRESET_EXTENSION   ".mlp"
 #define APP_DATA_ELEMENT_EXTENSION  ".mle"
 #define APP_MIDI_INTERFACE_NAME     "MidiLayer"
-#define APP_LOCK_FILE_NAME          "MidiLayer.pid"
+// Windows fork: QLockFile-lal kezelt zárolófájl; az új név miatt az eredeti program
+// (vagy egy összeomlás) után ott maradt "MidiLayer.pid" már nem akadályozza az indítást.
+#define APP_LOCK_FILE_NAME          "MidiLayer.lock"
 #define APP_OBJECT_NAME_SEPARATOR   "|"
 
 #define APP_FONTS_DIR               "fonts"

@@ -90,23 +90,14 @@ int main(int argc, char *argv[])
 
 void checkSingleInstance()  {
 
-    // check if file exists and if yes: Is it really a file and no directory?
-    if (Utils::get()->checkLockFile()) {
+    // Windows fork: QLockFile - az összeomlás után ott maradt zárolófájlt magától eltávolítja
+    if (!Utils::get()->tryLockSingleInstance()) {
 
-        QMessageBox::StandardButton reply;
-
-        reply = QMessageBox::critical(
+        QMessageBox::critical(
                     NULL,
                     QString("%1 %2").arg(APP_NAME, APP_VERSION),
-                    QString("Another instance of %1 is running. If you experienced a abnormal application exit, you must remove the file \"%2\" manualy or reboot you device.").arg(APP_NAME).arg(Utils::get()->getLockFileCompletePath()));
-
-        if (reply == QMessageBox::Ok) {
-            exit(1);
-        }
-
-    } else {
-        // Create lock file with pid content
-        Utils::get()->createLockFile();
+                    QString("Another instance of %1 is already running.").arg(APP_NAME));
+        exit(1);
     }
 }
 
@@ -141,9 +132,14 @@ void detectAndSetRunMode(QStringList arguments)  {
         }
         else if (arguments.at(1) == "--remove-lock")   {
             if (Utils::get()->checkLockFile())  {
-                Utils::get()->deleteLockFile();
-                QString infoMessage = QString( QObject::tr("Lock removed!\nNow already can start the application normally.") );
-                QMessageBox::information(0, qApp->applicationName(), infoMessage);
+                // Windows fork: ha egy másik példány fut, a zárolófájl nem törölhető
+                if (Utils::get()->deleteLockFile())  {
+                    QString infoMessage = QString( QObject::tr("Lock removed!\nNow already can start the application normally.") );
+                    QMessageBox::information(0, qApp->applicationName(), infoMessage);
+                } else  {
+                    QString infoMessage = QString( QObject::tr("Could not remove the lock file. Another instance may be running.") );
+                    QMessageBox::warning(0, qApp->applicationName(), infoMessage);
+                }
             } else  {
                 QString infoMessage = QString( QObject::tr("No lock file founded!") );
                 QMessageBox::information(0, qApp->applicationName(), infoMessage);

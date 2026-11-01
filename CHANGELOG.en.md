@@ -37,6 +37,11 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   because the reloaded elements did not receive incoming MIDI messages. Now the preset
   plays right after a revert, its instrument settings are resent, and the metronome
   gets the restored values too.
+- **Bugfix**: After a crash or power failure the program refused to start ("Another
+  instance is running") until the lock file left in the temp folder was deleted by hand.
+  The program now detects when the instance that created the lock file is no longer
+  running, and removes it automatically. The lock file is now called `MidiLayer.lock`
+  instead of `MidiLayer.pid`.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

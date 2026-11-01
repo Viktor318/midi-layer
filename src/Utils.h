@@ -33,6 +33,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QLockFile>
 #include "config.h"
 #include "Logger.h"
 
@@ -84,8 +85,8 @@ public:
 
     QString getLockFileCompletePath();
     bool checkLockFile();
-    void createLockFile();
-    void deleteLockFile();
+    bool tryLockSingleInstance();   // Windows fork: false, ha egy másik példány fut
+    bool deleteLockFile();
 
 #ifdef QT_DEBUG
     QString toString(QStringList stringList);
@@ -97,6 +98,7 @@ private:
     bool portableMode;
     QString dataDir;
     QString preferencesDir;
+    QLockFile * lockFile = nullptr;     // Windows fork: a futó példány zárolása
 
 };
 

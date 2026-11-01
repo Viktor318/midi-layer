@@ -40,6 +40,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   ki nem választottuk, mert az újratöltött elemek nem kapták meg a bejövő
   MIDI-üzeneteket. Most a visszavonás után a preset azonnal szól, a hangszer-beállítások
   újra kimennek, és a metronóm is a visszaállított értékeket kapja meg.
+- **Hibajavítás**: Összeomlás vagy áramszünet után a program nem indult el („Another
+  instance is running”), amíg kézzel ki nem töröltük az ideiglenes mappában maradt
+  zárolófájlt. Most a program felismeri, ha a zárolófájlt létrehozó példány már nem fut,
+  és magától eltávolítja. A zárolófájl neve `MidiLayer.pid` helyett `MidiLayer.lock`.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

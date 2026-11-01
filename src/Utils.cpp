@@ -539,21 +539,43 @@ bool Utils::checkLockFile() {
 }
 
 
-void Utils::createLockFile()    {
-    // Create lock file with pid content
-    QFile lockFile( getLockFileCompletePath() );
-    if ( lockFile.open(QIODevice::ReadWrite) )
-    {
-        QTextStream stream( &lockFile );
-        stream << QCoreApplication::applicationPid() << "\n";
+// Windows fork: az egyetlen futó példány biztosítása QLockFile-lal. Az eredeti megoldás egy
+// egyszerű PID-fájlt hozott létre, és indításkor csak azt nézte, hogy létezik-e. Összeomlás vagy
+// áramszünet után a fájl ott maradt, és a program nem indult el, amíg kézzel ki nem töröltük
+// (vagy --remove-lock-kal el nem indítottuk). A QLockFile felismeri az elárvult zárolást (a
+// fájlban szereplő folyamat már nem fut), és magától eltávolítja.
+bool Utils::tryLockSingleInstance()    {
+    if (lockFile == nullptr)  {
+        lockFile = new QLockFile( getLockFileCompletePath() );
+        // csak akkor elavult, ha a zároló folyamat már nem fut (az életkor nem számít)
+        lockFile->setStaleLockTime(0);
     }
+    if (lockFile->isLocked() || lockFile->tryLock(0))
+        return true;
+
+    if (lockFile->error() == QLockFile::LockFailedError)   {
+        qint64 pid = 0;
+        QString hostName, appName;
+        lockFile->getLockInfo(&pid, &hostName, &appName);
+        if (ISLOGGABLE_WARN) LOG_WARN(QString("Another instance is running (pid %1, lock file '%2')").arg(pid).arg(getLockFileCompletePath()));
+        return false;
+    }
+
+    // Egyéb hiba (pl. nem írható az ideiglenes mappa): ne akadályozza az indítást
+    if (ISLOGGABLE_WARN) LOG_WARN(QString("Could not create lock file '%1' (error %2), starting without single instance check")
+                                  .arg(getLockFileCompletePath()).arg(lockFile->error()));
+    return true;
 }
 
 
-void Utils::deleteLockFile()    {
-    // Remove lock file
-    QFile lockFile( getLockFileCompletePath() );
-    lockFile.remove();
+bool Utils::deleteLockFile()    {
+    // Saját zárolás feloldása
+    if (lockFile != nullptr && lockFile->isLocked())  {
+        lockFile->unlock();
+        return true;
+    }
+    // --remove-lock: egy idegen zárolófájl törlése (Windowson nem sikerül, amíg a másik példány fut)
+    return QFile::remove( getLockFileCompletePath() );
 }
 
 
