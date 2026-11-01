@@ -114,6 +114,11 @@ public:
     // ragadnak be hangok.
     void registerSoundingNote(int inSlot, int inChannel, int inNote, int outSlot, int outChannel, int outNote);
     void registerSustainOn(int inSlot, int inChannel, int outSlot, int outChannel);
+    // Windows fork: nyugalmi állásból kimozdított vezérlők (pitch bend, moduláció, fúvás,
+    // channel aftertouch) nyilvántartása; a 'kind' a vezérlő száma, vagy TRACK_BEND / TRACK_CHANAFT
+    static const int TRACK_BEND = 128;
+    static const int TRACK_CHANAFT = 129;
+    void registerDeflected(int inSlot, int inChannel, int kind, int outSlot, int outChannel);
 
 
 public slots:
@@ -185,6 +190,9 @@ private:
     };
     QHash<int, QList<OutTarget>> soundingNotes;     // kulcs: bemeneti slot + csatorna + billentyű
     QHash<int, QList<OutTarget>> sustainedOutputs;  // kulcs: bemeneti slot + csatorna
+    QHash<int, QList<OutTarget>> deflectedOutputs;  // kulcs: bemeneti slot + csatorna + fajta (deflectKey)
+    static int deflectKey(int slot, int channel, int kind) { return (slot << 12) | ((channel & 0x0F) << 8) | (kind & 0xFF); }
+    void releaseDeflected(int inSlot, int inChannel, int kind);
     static int trackKey(int slot, int channel, int note) { return (slot << 11) | ((channel & 0x0F) << 7) | (note & 0x7F); }
     void clearTrackedNotes();
 

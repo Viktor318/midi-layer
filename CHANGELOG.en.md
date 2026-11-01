@@ -19,17 +19,21 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   release exactly there.
 - **Bugfix**: Stuck sustain pedal after a preset change. The pedal (CC64) release is now
   sent to every channel the pedal press was sent to.
+- **Bugfix**: Stuck pitch bend, modulation (CC1), breath (CC2) and channel aftertouch
+  after a preset change. If the wheel was moved during the change, the old channel stayed
+  detuned or modulated. Now, when the wheel (or pressure) returns to rest, the rest
+  value is sent to every channel that previously received a different value.
 - **Bugfix**: If the program started without a configured MIDI output and the output was
   selected afterwards, the instrument settings of the active preset (SysEx, bank,
   program, volume) never reached the synth, and everything played with the default
   sound until the next preset change. They are now resent when the output port opens.
-- **Bug fix**: A Program Change higher than the number of presets in the bank
+- **Bugfix**: A Program Change higher than the number of presets in the bank
   deselected the current preset without selecting a new one, so everything went
   silent. Such Program Changes are now ignored and the current preset stays active.
 - Preset switching by Program Change can be turned off on the "input/output options"
   tab of MIDI Setup (on by default). When it is off, all Program Changes are forwarded
   to the outputs.
-- **Bug fix**: After reverting a preset, it stayed silent until it was selected again,
+- **Bugfix**: After reverting a preset, it stayed silent until it was selected again,
   because the reloaded elements did not receive incoming MIDI messages. Now the preset
   plays right after a revert, its instrument settings are resent, and the metronome
   gets the restored values too.

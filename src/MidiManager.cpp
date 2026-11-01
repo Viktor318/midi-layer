@@ -791,6 +791,32 @@ void MidiManager::registerSustainOn(int inSlot, int inChannel, int outSlot, int 
 }
 
 
+// A vezérlő a nyugalmi állásán kívül ment ki erre a kimenetre: bejegyezzük, hogy amikor a
+// bemeneti vezérlő visszatér a nyugalmi állásba, a nyugalmi érték ide is kimenjen - akkor is,
+// ha közben presetet váltottunk, és ez a kimenet már nem tartozik az aktuális presethez.
+void MidiManager::registerDeflected(int inSlot, int inChannel, int kind, int outSlot, int outChannel)    {
+    OutTarget target = { outSlot, outChannel, 0 };
+    QList<OutTarget> & targets = deflectedOutputs[deflectKey(inSlot, inChannel, kind)];
+    if (!targets.contains(target))
+        targets.append(target);
+}
+
+
+// A bemeneti vezérlő visszatért a nyugalmi állásba: a nyugalmi érték minden bejegyzett kimenetre
+// kimegy. Az aktuális preset elemei ezután maguk is elküldik - a kettőzött nyugalmi érték ártalmatlan.
+void MidiManager::releaseDeflected(int inSlot, int inChannel, int kind)    {
+    QList<OutTarget> targets = deflectedOutputs.take(deflectKey(inSlot, inChannel, kind));
+    for (const OutTarget & target : targets)   {
+        if (kind == TRACK_BEND)
+            sendBender(target.slot, target.channel, (unsigned char) 0x00, (unsigned char) 0x40);
+        else if (kind == TRACK_CHANAFT)
+            sendChanKeyPress(target.slot, target.channel, 0);
+        else
+            sendController(target.slot, target.channel, kind, 0);
+    }
+}
+
+
 void MidiManager::slotReleaseTrackedNotes(ChannelMessage channelMessage)   {
 
     unsigned char status = channelMessage.getStatus();
@@ -812,6 +838,25 @@ void MidiManager::slotReleaseTrackedNotes(ChannelMessage channelMessage)   {
         for (const OutTarget & target : targets)   {
             sendController(target.slot, target.channel, CTL_SUSTAIN, 0);
         }
+        return;
+    }
+
+    // Pitch bend középállásban (0x2000: LSB 0, MSB 0x40)
+    if ( status == STATUS_BENDER && channelMessage.getByte1() == 0x00 && channelMessage.getByte2() == 0x40 )  {
+        releaseDeflected(channelMessage.getSlotNumber(), channelMessage.getChannel(), TRACK_BEND);
+        return;
+    }
+
+    // Channel aftertouch nullán
+    if ( status == STATUS_CHANAFT && channelMessage.getByte1() == 0 )  {
+        releaseDeflected(channelMessage.getSlotNumber(), channelMessage.getChannel(), TRACK_CHANAFT);
+        return;
+    }
+
+    // Modulációs kerék, fúvásvezérlő nullán
+    if ( status == STATUS_CTLCHG && (channelMessage.getByte1() == CTL_MODULATION || channelMessage.getByte1() == CTL_BREATH)
+         && channelMessage.getByte2() == 0 )  {
+        releaseDeflected(channelMessage.getSlotNumber(), channelMessage.getChannel(), channelMessage.getByte1());
     }
 }
 
@@ -819,6 +864,7 @@ void MidiManager::slotReleaseTrackedNotes(ChannelMessage channelMessage)   {
 void MidiManager::clearTrackedNotes()   {
     soundingNotes.clear();
     sustainedOutputs.clear();
+    deflectedOutputs.clear();
 }
 
 

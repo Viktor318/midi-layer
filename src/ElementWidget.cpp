@@ -1062,6 +1062,10 @@ void ElementWidget::processChannelAftertouch(ChannelMessage channelMessage)  {
     // Filter Channel Aftertouch
     if (ui->cbAftertouch->isChecked())    {
         MidiManager::get()->sendChanKeyPress( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,channelMessage.getByte1());
+        // Windows fork: a nem nulla aftertouch bejegyzése (lásd MidiManager::registerDeflected)
+        if ( channelMessage.getByte1() != 0 )
+            MidiManager::get()->registerDeflected( channelMessage.getSlotNumber(), channelMessage.getChannel(), MidiManager::TRACK_CHANAFT,
+                                                   ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1 );
         if (ISLOGGABLE_TRACE) LOG_TRACE( ui->lName->text()+" sendChanKeyPress...");
         ledOut->flash();
         ledAftertouchYes->flash();
@@ -1154,6 +1158,13 @@ void ElementWidget::processControlChange(ChannelMessage channelMessage)  {
                 MidiManager::get()->registerSustainOn( channelMessage.getSlotNumber(), channelMessage.getChannel(),
                                                        ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1 );
             }
+            // Windows fork: a nullától eltérő moduláció / fúvás bejegyzése, hogy a kerék
+            // visszaállításakor ide is kimenjen a 0 (lásd MidiManager::registerDeflected).
+            if ( (inController == CTL_MODULATION || inController == CTL_BREATH) &&
+                 channelMessage.getByte1() == inController && channelMessage.getByte2() != 0 )  {
+                MidiManager::get()->registerDeflected( channelMessage.getSlotNumber(), channelMessage.getChannel(), inController,
+                                                       ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1 );
+            }
             ledOut->flash();
         }
     }
@@ -1171,6 +1182,10 @@ void ElementWidget::processPitchBend(ChannelMessage channelMessage)  {
     // Filter Pitch bend
     if (ui->cbPitchBend->isChecked())    {
         MidiManager::get()->sendBender( ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,channelMessage.getByte1(), channelMessage.getByte2());
+        // Windows fork: a középállástól eltérő pitch bend bejegyzése (lásd MidiManager::registerDeflected)
+        if ( !(channelMessage.getByte1() == 0x00 && channelMessage.getByte2() == 0x40) )
+            MidiManager::get()->registerDeflected( channelMessage.getSlotNumber(), channelMessage.getChannel(), MidiManager::TRACK_BEND,
+                                                   ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1 );
         if (ISLOGGABLE_TRACE) LOG_TRACE( ui->lName->text()+" sendBender...");
         ledOut->flash();
         ledPitchBendYes->flash();
