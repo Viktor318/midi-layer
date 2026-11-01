@@ -84,6 +84,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   lost for good); deleting a preset did not put its elements into the trash; the trash
   showed up as a bank called "trash" in the Open Bank list (the old `data/trash` folder
   is now hidden).
+- **Bugfix**: When the MIDI monitor was closed with Esc, its monitoring stayed on: the next
+  time it was opened, every message appeared several times. Monitoring now stops whenever
+  the window is closed (Esc included).
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

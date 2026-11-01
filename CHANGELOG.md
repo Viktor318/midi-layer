@@ -83,6 +83,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   törlés viszont megtörtént (az elem véglegesen elveszett); preset törlésekor az elemek
   nem jutottak a lomtárba; a lomtár „trash” nevű bankként jelent meg a bankmegnyitó
   listában (a régi `data/trash` mappa most rejtve marad).
+- **Hibajavítás**: Ha a MIDI-monitort Esc-kel zártuk be, a figyelése bekapcsolva maradt:
+  a következő megnyitáskor minden üzenet többször jelent meg. Most az ablak bármilyen
+  bezárásakor (Esc is) leáll a figyelés.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

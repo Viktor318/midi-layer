@@ -253,14 +253,20 @@ void MidiMonitor::showEvent(QShowEvent * event)   {
 
     MidiManager::get()->setEmitSentChannelMessage(true);
 
-    connect(MidiManager::get(), SIGNAL(receivedChannelMessage(ChannelMessage)), this, SLOT( slotReceivedChannelMessage(ChannelMessage)) );
-    connect(MidiManager::get(), SIGNAL(sentChannelMessage(ChannelMessage)), this, SLOT( slotSentChannelMessage(ChannelMessage)) );
+    // Windows fork: UniqueConnection - egy jel akkor se kötődjön be kétszer, ha a megjelenítés
+    // többször jön egymás után
+    connect(MidiManager::get(), SIGNAL(receivedChannelMessage(ChannelMessage)), this, SLOT( slotReceivedChannelMessage(ChannelMessage)), Qt::UniqueConnection );
+    connect(MidiManager::get(), SIGNAL(sentChannelMessage(ChannelMessage)), this, SLOT( slotSentChannelMessage(ChannelMessage)), Qt::UniqueConnection );
     event->accept();
     if (ISLOGGABLE_INFO) LOG_INFO("Monitor opened");
 }
 
 
-void MidiMonitor::closeEvent(QCloseEvent * event)    {
+// Windows fork: a figyelés lekapcsolása az ablak eltűnésekor, nem a bezárásakor. Esc-re (a QDialog
+// reject()-je) a Qt nem hív closeEvent-et, csak elrejti az ablakot, így eddig a jelek bekötve
+// maradtak: a következő megnyitáskor minden üzenet többször jelent meg, és a kimenő üzenetek
+// figyelése (setEmitSentChannelMessage) is bekapcsolva maradt. A hideEvent minden esetben jön.
+void MidiMonitor::hideEvent(QHideEvent * event)    {
 
     MidiManager::get()->setEmitSentChannelMessage(false);
 

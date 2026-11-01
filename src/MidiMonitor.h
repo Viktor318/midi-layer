@@ -64,7 +64,7 @@ private:
     Ui::MidiMonitor *ui;
     QAction *actionClose;
     void showEvent(QShowEvent * event);
-    void closeEvent(QCloseEvent * event);
+    void hideEvent(QHideEvent * event);     // Windows fork: closeEvent helyett (lásd a .cpp-ben)
     void print(QString text, QColor * color, bool wasReceived);
     void printRaw(ChannelMessage * channelMessage, QColor * color, bool wasReceived);
     QString getNoteName(unsigned char noteCode);
