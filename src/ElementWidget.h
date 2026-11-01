@@ -106,6 +106,7 @@ private:
     void systemExclusiveTextParser(QString systemExclusiveText, std::vector<unsigned char> * buffer);
     unsigned char hexText2uchar(QString hexText);
     unsigned char hexChar2uchar(QChar hexChar);
+    void showSysExValidity(QLineEdit * field, const std::vector<unsigned char> & data);   // Windows fork
     bool validateSysExclusive(std::vector<unsigned char> systemExclusiveData);
     QString renderSystemExclusiveForSave( QString systemExclusiveOnGUI );
     QString renderControllersForSave();

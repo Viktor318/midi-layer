@@ -284,7 +284,13 @@ void ElementWidget::selectElement()   {
 void ElementWidget::sendSelectMessages()   {
 
     // Send system exclusive
-    if ( ui->groupBoxSendSystemExclusive->isChecked() && this->systemExclusiveOnSelect.size()>0 ) {
+    // Windows fork: csak érvényes (F0 ... F7) SysEx megy ki; eddig bármilyen nem üres tartalom
+    // kiment, és egy F7 nélküli üzenettől egyes hangszerek "várakozó" állapotba kerülhetnek
+    if ( ui->groupBoxSendSystemExclusive->isChecked() && !this->systemExclusiveOnSelect.empty()
+         && !this->validateSysExclusive(this->systemExclusiveOnSelect) )  {
+        if (ISLOGGABLE_WARN) LOG_WARN("Invalid SysEx on select not sent (element \"" + this->elementName + "\")");
+    }
+    if ( ui->groupBoxSendSystemExclusive->isChecked() && this->validateSysExclusive(this->systemExclusiveOnSelect) ) {
         MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnSelect );
         // Set a delay before send Bank Change and Program Change
         // Prevents some equipment problems
@@ -333,7 +339,8 @@ void ElementWidget::unselectElement()   {
             }
 
             // Send system exclusive
-            if ( ui->groupBoxSendSystemExclusive->isChecked() && this->systemExclusiveOnUnselect.size()>0) {
+            // Windows fork: csak érvényes (F0 ... F7) SysEx megy ki
+            if ( ui->groupBoxSendSystemExclusive->isChecked() && this->validateSysExclusive(this->systemExclusiveOnUnselect) ) {
                 MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnUnselect );
             }
 
@@ -495,6 +502,7 @@ void ElementWidget::slotViewSelectedControllers() {
 void ElementWidget::slotSystemExclusiveOnSelect(QString systemExclusiveText)  {
     this->systemExclusiveTextParser(systemExclusiveText, &systemExclusiveOnSelect);
     ui->buttonSendSEOnSelect->setEnabled( this->validateSysExclusive(this->systemExclusiveOnSelect) );
+    this->showSysExValidity(ui->systemExclusiveOnSelect, this->systemExclusiveOnSelect);
     slotMarkEdited();
 }
 
@@ -502,19 +510,32 @@ void ElementWidget::slotSystemExclusiveOnSelect(QString systemExclusiveText)  {
 void ElementWidget::slotSystemExclusiveOnUnselect(QString systemExclusiveText)    {
     this->systemExclusiveTextParser(systemExclusiveText, &systemExclusiveOnUnselect);
     ui->buttonSendSEOnUnselect->setEnabled( this->validateSysExclusive(this->systemExclusiveOnUnselect) );
+    this->showSysExValidity(ui->systemExclusiveOnUnselect, this->systemExclusiveOnUnselect);
     slotMarkEdited();
 }
 
 
+// Windows fork: a SysEx-mező piros szövegű, ha nem üres, de nem érvényes (F0 ... F7) üzenet -
+// ilyenkor a program nem küldi ki
+void ElementWidget::showSysExValidity(QLineEdit * field, const std::vector<unsigned char> & data)   {
+    bool hasText = !field->text().trimmed().isEmpty();
+    bool invalid = hasText && !this->validateSysExclusive(data);
+    field->setStyleSheet( invalid ? "color: #D02020;" : "" );
+    field->setToolTip( invalid ? QString("Invalid SysEx: it must start with F0 and end with F7. It will not be sent.")
+                               : ( field == ui->systemExclusiveOnSelect ? QString("SysEx to send on preset select")
+                                                                         : QString("SysEx to send on preset unselect") ) );
+}
+
+
 void ElementWidget::slotSendSEOnSelect()    {
-    if (ui->buttonEnable->isChecked() && this->systemExclusiveOnSelect.size()>0)    {
+    if (ui->buttonEnable->isChecked() && this->validateSysExclusive(this->systemExclusiveOnSelect))    {     // Windows fork: validálás
         MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnSelect );
     }
 }
 
 
 void ElementWidget::slotSendSEOnUnselect()    {
-    if (ui->buttonEnable->isChecked() && this->systemExclusiveOnUnselect.size()>0)
+    if (ui->buttonEnable->isChecked() && this->validateSysExclusive(this->systemExclusiveOnUnselect))    // Windows fork: validálás
         MidiManager::get()->sendSysex( ui->cbPortOut->currentIndex(), &this->systemExclusiveOnUnselect );
 }
 
@@ -1565,6 +1586,11 @@ void ElementWidget::systemExclusiveTextParser(QString systemExclusiveText, std::
     for (int i=0; i<textPiece.count();i++)  {
         if (textPiece.at(i).length()==2 )  {
             buffer->push_back( this->hexText2uchar( textPiece.at(i)) );
+        } else  {
+            // Windows fork: egy félbehagyott (egyjegyű) bájtot az eredeti csendben kihagyott, így a
+            // többi bájt eltolódva, hibás üzenetként mehetett ki. Most az egész üzenet érvénytelen.
+            buffer->clear();
+            return;
         }
     }
 }

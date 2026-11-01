@@ -87,6 +87,10 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: When the MIDI monitor was closed with Esc, its monitoring stayed on: the next
   time it was opened, every message appeared several times. Monitoring now stops whenever
   the window is closed (Esc included).
+- **Bugfix**: Invalid SysEx (not starting with F0 or not ending with F7) was sent on element
+  select and unselect too, and an unfinished one-digit byte was silently skipped, so a
+  shifted message could be sent. Only valid SysEx is sent now; an invalid SysEx field is
+  shown in red, and its tooltip explains the problem.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

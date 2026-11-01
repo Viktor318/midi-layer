@@ -86,6 +86,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - **Hibajavítás**: Ha a MIDI-monitort Esc-kel zártuk be, a figyelése bekapcsolva maradt:
   a következő megnyitáskor minden üzenet többször jelent meg. Most az ablak bármilyen
   bezárásakor (Esc is) leáll a figyelés.
+- **Hibajavítás**: Az elem kiválasztásakor és leválasztásakor a hibás (nem F0-val kezdődő
+  vagy nem F7-tel végződő) SysEx is kiment, és egy félbehagyott, egyjegyű bájtot a program
+  csendben kihagyott, így eltolódott üzenet mehetett ki. Most csak érvényes SysEx megy ki;
+  a hibás SysEx-mező szövege piros, a tippje megmondja, mi a baj.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).
