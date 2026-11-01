@@ -423,8 +423,29 @@ QString Utils::buildElementTabIconPath(bool isActive, bool isEdited)  {
 }
 
 
+// Windows fork: csak kis- és nagybetűben eltérő átnevezés (pl. "piano" -> "Piano"). Windowson a
+// fájlrendszer nem különbözteti meg a kettőt, így a cél "már létezik"; ilyenkor két lépésben,
+// egy ideiglenes néven át nevezünk át, ami minden fájlrendszeren működik.
+static bool renameCaseOnly(const QString & oldName, const QString & newName)   {
+    QString tempName = oldName + ".renaming";
+    QDir dir;
+    if (!dir.rename(oldName, tempName))
+        return false;
+    if (!dir.rename(tempName, newName))   {
+        dir.rename(tempName, oldName);  // visszaállítás
+        return false;
+    }
+    return true;
+}
+
+
 bool Utils::renameFile(QString oldName, QString newName)    {
-    if ( !QFile::rename(oldName, newName) )  {
+    if (oldName == newName)
+        return true;
+    bool renamed = (oldName.compare(newName, Qt::CaseInsensitive) == 0)
+                   ? renameCaseOnly(oldName, newName)
+                   : QFile::rename(oldName, newName);
+    if ( !renamed )  {
         if (ISLOGGABLE_ERROR) LOG_ERROR("Can not rename file '"+ oldName +"' to '"+ newName+ "'");
         return false;
     }
@@ -433,8 +454,13 @@ bool Utils::renameFile(QString oldName, QString newName)    {
 
 
 bool Utils::renameDir(QString oldName, QString newName)    {
+    if (oldName == newName)
+        return true;
     QDir dir;
-    if ( !dir.rename(oldName, newName) )  {
+    bool renamed = (oldName.compare(newName, Qt::CaseInsensitive) == 0)
+                   ? renameCaseOnly(oldName, newName)
+                   : dir.rename(oldName, newName);
+    if ( !renamed )  {
         if (ISLOGGABLE_ERROR) LOG_ERROR("Can not rename directory '"+ oldName +"' to '"+ newName+ "'");
         return false;
     }

@@ -543,8 +543,10 @@ void PresetWidget::slotNameChanged()    {
         return;
     }
 
+    // Windows fork: a csak kis- és nagybetűben eltérő új név (pl. "piano" -> "Piano") nem ütközés -
+    // Windowson a mappa ilyenkor "létezik", mert ugyanaz a mappa
     QFile file( buildPresetPath(newName) );
-    if ( file.exists() )	{
+    if ( file.exists() && newName.compare(oldName, Qt::CaseInsensitive) != 0 )	{
         disconnect (this->nameEdit, SIGNAL(editingFinished()), this, SLOT( slotNameChanged() ) );
         QString message = QString( "Preset '%1' already exists.").arg(newName);
         QMessageBox::critical(0, APP_NAME, message);
@@ -553,7 +555,8 @@ void PresetWidget::slotNameChanged()    {
         return;
     }
 
-    Utils::get()->renameFile( buildPresetPath(oldName), buildPresetPath( newName) );
+    // Windows fork: mappát a renameDir nevez át (kis- és nagybetűs átnevezést is kezel)
+    Utils::get()->renameDir( buildPresetPath(oldName), buildPresetPath( newName) );
     Utils::get()->renameFile( buildPresetPath(newName)+"/"+oldName+APP_DATA_PRESET_EXTENSION, buildPresetPath( newName)+"/"+newName+APP_DATA_PRESET_EXTENSION );
     this->presetName = newName;
 

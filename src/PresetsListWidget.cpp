@@ -783,7 +783,8 @@ void PresetsListWidget::slotBankNameChanged()   {
 
     QString newDirName = buildBankPath(newName);
     QFile file( newDirName );
-    if ( file.exists() )	{
+    // Windows fork: a csak kis- és nagybetűben eltérő új név nem ütközés (ugyanaz a mappa)
+    if ( file.exists() && newName.compare(oldName, Qt::CaseInsensitive) != 0 )	{
         QString message = QString( "Bank'%1' already exists.").arg(newName);
         QMessageBox::critical(0, APP_NAME, message);
         this->changeBankNameEditProgramaticly(this->getCloneName(newName));

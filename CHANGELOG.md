@@ -90,6 +90,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   vagy nem F7-tel végződő) SysEx is kiment, és egy félbehagyott, egyjegyű bájtot a program
   csendben kihagyott, így eltolódott üzenet mehetett ki. Most csak érvényes SysEx megy ki;
   a hibás SysEx-mező szövege piros, a tippje megmondja, mi a baj.
+- **Hibajavítás**: Windowson egy bank, preset vagy elem nevét nem lehetett csak kis- és
+  nagybetűben átírni (pl. „piano” → „Piano”): a program névütközésnek vette, vagy az
+  átnevezés meghiúsult. Most ez működik.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).
