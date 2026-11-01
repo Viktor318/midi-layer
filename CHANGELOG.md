@@ -31,6 +31,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - A MIDI Setup „input/output options” lapján kikapcsolható a Program Change-re
   történő presetváltás (alapból bekapcsolva). Kikapcsolva minden Program Change
   továbbmegy a kimenetekre.
+- **Hibajavítás**: A preset visszavonása (Revert) után a preset elnémult, amíg újra
+  ki nem választottuk, mert az újratöltött elemek nem kapták meg a bejövő
+  MIDI-üzeneteket. Most a visszavonás után a preset azonnal szól, a hangszer-beállítások
+  újra kimennek, és a metronóm is a visszaállított értékeket kapja meg.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

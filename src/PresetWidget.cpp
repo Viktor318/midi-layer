@@ -280,7 +280,16 @@ bool PresetWidget::load(QString bankName, QString presetName)   {
 }
 
 
+// Windows fork: az eredeti változat a régi elemeket kiválasztott állapotban törölte, az újra
+// betöltött elemeket pedig nem választotta ki, ezért ezek nem kapták meg a bejövő MIDI-üzeneteket:
+// a preset a visszavonás után elnémult, amíg újra ki nem választottuk. Most az aktív preset
+// elemeit előbb rendesen leválasztjuk, a betöltés után pedig újra kiválasztjuk (ez a hangszer-
+// beállításokat is újra kiküldi), és a metronóm is a visszaállított értékeket kapja meg.
 void PresetWidget::slotRevert()  {
+    bool wasActive = this->active;
+    if (wasActive)
+        this->slotUnselected();
+
     // Remove elements from tab only (memory)
     for (int i=tabElement->count()-1; i > -1 ; i--)  {
         ElementWidget * element = (ElementWidget *) tabElement->widget(i);
@@ -288,6 +297,11 @@ void PresetWidget::slotRevert()  {
         delete element;
     }
     this->load(this->bankName, this->presetName);
+
+    if (wasActive)  {
+        this->slotSelected();
+        emit reverted();
+    }
     this->setEdited(false);
 }
 

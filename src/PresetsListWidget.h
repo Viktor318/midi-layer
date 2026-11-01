@@ -118,6 +118,7 @@ public slots:
 private slots:
 
     void slotChangePresetByProgramChange(int programChangeValue);
+    void slotPresetReverted();
     void slotPreservePresetOrder(bool preserve);
     void slotBankNameChanged();
     void slotDuplicatePreset();

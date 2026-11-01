@@ -155,6 +155,7 @@ public slots:
 signals:
 
     void nameChanged(QString oldName, QString newName);
+    void reverted();
 
 };
 

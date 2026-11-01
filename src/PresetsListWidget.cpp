@@ -186,7 +186,16 @@ void PresetsListWidget::selectPreset(QString selectedPreset)  {
     currentPreset->setPC(this->presetList->currentIndex().row()+1);
     this->sendInfoToMetronome();
     connect(currentPreset, SIGNAL(nameChanged(QString,QString)), this, SLOT(slotPresetNameChanged(QString,QString)));
+    connect(currentPreset, SIGNAL(reverted()), this, SLOT(slotPresetReverted()));
     lastPresetSelected = selectedPreset;
+}
+
+
+// Windows fork: a preset visszavonása (Revert) után a metronóm is a fájlból visszaállított
+// értékeket kapja meg.
+void PresetsListWidget::slotPresetReverted() {
+    if (currentPreset)
+        this->sendInfoToMetronome();
 }
 
 

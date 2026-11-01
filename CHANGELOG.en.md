@@ -29,6 +29,10 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - Preset switching by Program Change can be turned off on the "input/output options"
   tab of MIDI Setup (on by default). When it is off, all Program Changes are forwarded
   to the outputs.
+- **Bug fix**: After reverting a preset, it stayed silent until it was selected again,
+  because the reloaded elements did not receive incoming MIDI messages. Now the preset
+  plays right after a revert, its instrument settings are resent, and the metronome
+  gets the restored values too.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
