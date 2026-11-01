@@ -94,6 +94,11 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: On Windows, a bank, preset or element could not be renamed by changing only
   the letter case (e.g. "piano" → "Piano"): the program treated it as a name collision, or
   the rename failed. This now works.
+- **Bugfix**: If there was no bank to open on startup (first start, deleted
+  `midiLayer.ini`, or the last bank's folder no longer exists), the program started without
+  a bank, and a new preset was created in the root of the data folder. Now the first
+  existing bank is opened, or a new bank is created if there is none; presets cannot be
+  created without a bank.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

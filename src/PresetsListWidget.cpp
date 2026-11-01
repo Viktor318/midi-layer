@@ -709,6 +709,11 @@ void PresetsListWidget::newPresetFrom(QString presetCompleteName) {
 
     if (ISLOGGABLE_INFO) LOG_INFO("Creating new preset from \"" + presetCompleteName +"\"");
     //currentPreset->save();
+    // Windows fork: bank nélkül a preset az adatmappa gyökerébe kerülne
+    if (this->bankName.isEmpty())   {
+        QMessageBox::warning(this, APP_NAME, "Open or create a bank first.");
+        return;
+    }
     // Windows fork: a másolat a lemezről készül, és utána az új presetre váltunk
     if (!this->confirmUnsavedChanges("Do you want to save them before creating a new preset?"))
         return;
@@ -742,6 +747,11 @@ void PresetsListWidget::newPresetFrom(QString presetCompleteName) {
 void PresetsListWidget::slotAddPreset()  {
 
     if (ISLOGGABLE_INFO) LOG_INFO("Adding new preset");
+    // Windows fork: bank nélkül a preset az adatmappa gyökerébe kerülne
+    if (this->bankName.isEmpty())   {
+        QMessageBox::warning(this, APP_NAME, "Open or create a bank first.");
+        return;
+    }
     // Windows fork: utána az új presetre váltunk
     if (!this->confirmUnsavedChanges("Do you want to save them before creating a new preset?"))
         return;

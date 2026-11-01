@@ -84,7 +84,25 @@ MainWindow::MainWindow(QApplication */*parent*/)
     this->loadSettings();
     this->buildConnections();
 
-    presetsWidget->loadBank(activeBankName);
+    // Windows fork: ha nincs megnyitandó bank (pl. első indítás vagy törölt midiLayer.ini), vagy a
+    // mappája már nem létezik, az első meglévő bank nyílik meg, ennek híján egy új bank jön létre.
+    // Eredetileg ilyenkor nem volt megnyitott bank, és egy új preset az adatmappa gyökerébe került.
+    if ( activeBankName.isEmpty() || !QDir( Utils::get()->getDataDir() + "/" + activeBankName ).exists() )  {
+        QStringList banks = Utils::get()->searchBanksOnDir( Utils::get()->getDataDir() );
+        banks.sort(Qt::CaseInsensitive);
+        if (!banks.isEmpty())   {
+            if (ISLOGGABLE_INFO) LOG_INFO("No bank to open (\"" + activeBankName + "\"), opening first bank \"" + banks.first() + "\"");
+            activeBankName = banks.first();
+            presetsWidget->loadBank(activeBankName);
+        } else  {
+            activeBankName = Utils::get()->getCloneName("new bank", Utils::get()->getBanksOnDir( Utils::get()->getDataDir() ) );
+            if (ISLOGGABLE_INFO) LOG_INFO("No bank found, creating new bank \"" + activeBankName + "\"");
+            presetsWidget->newBank(activeBankName);
+        }
+    } else  {
+        presetsWidget->loadBank(activeBankName);
+    }
+    presetDock->setToolTip(activeBankName);
     this->setTitleWithBankName(activeBankName);
 
 #ifdef QT_DEBUG
