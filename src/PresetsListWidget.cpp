@@ -643,7 +643,9 @@ void PresetsListWidget::deletePreset(QString presetName, bool showConfirm)  {
             return;
     }
 
-    currentPreset->remove();
+    // Windows fork: ha a lomtárba tétel nem sikerül, a preset marad
+    if (!currentPreset->remove())
+        return;
 
     QListWidgetItem * item = new QListWidgetItem();
     item = this->presetList->takeItem( this->getPresetListRow(currentPreset->getName()) );

@@ -169,6 +169,51 @@ bool Utils::removeDir(const QString &dirName)
 }
 
 
+// Windows fork: törlés lomtárba. Elsőként a rendszer lomtárába (Windowson a Lomtár), ahonnan
+// eredeti helyére visszaállítható. Ha ez nem sikerül (pl. pendrive-on nincs Lomtár, vagy ki van
+// kapcsolva), a saját lomtárba másol (az adatmappa mellett: trash/<időbélyeg>/<bank>/<név>), és
+// csak sikeres másolás után töröl. Ha a másolás sem sikerül, nem töröl semmit, és hamisat ad.
+// Az eredeti megoldás a lomtár mappáját relatív útvonallal hozta létre, a másolás hibáját nem
+// figyelte, és a törlést mindenképp elvégezte - így egy elem véglegesen elveszhetett.
+bool Utils::moveToTrash(QString path, QString bankName, QString relativeName)   {
+    QFileInfo info(path);
+    if (!info.exists())
+        return true;    // nincs mit törölni (pl. még nem mentett elem)
+
+    if (QFile::moveToTrash(path))   {
+        if (ISLOGGABLE_INFO) LOG_INFO("Moved to system trash: \"" + path + "\"");
+        return true;
+    }
+
+    QString destination = getFallbackTrashDir() + "/" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss")
+                          + "/" + bankName + "/" + relativeName;
+    if (ISLOGGABLE_WARN) LOG_WARN("System trash not available, copying \"" + path + "\" to \"" + destination + "\"");
+
+    bool copied;
+    if (info.isDir())   {
+        copied = copyDir(path, destination, true);
+    } else  {
+        QDir().mkpath(QFileInfo(destination).absolutePath());
+        QFile::remove(destination);
+        copied = QFile::copy(path, destination);
+    }
+    if (!copied)   {
+        if (ISLOGGABLE_ERROR) LOG_ERROR("Could not copy \"" + path + "\" to trash, nothing deleted");
+        return false;
+    }
+
+    bool removed = info.isDir() ? removeDir(path) : QFile::remove(path);
+    if (!removed)
+        if (ISLOGGABLE_ERROR) LOG_ERROR("Copied to trash, but could not remove \"" + path + "\"");
+    return removed;
+}
+
+
+QString Utils::getFallbackTrashDir()   {
+    return getPreferencesDir() + "/" + APP_TRASH_DIR;
+}
+
+
 QStringList Utils::getBanksOnDir(QString baseDir) {
 
     QStringList dirList;
@@ -204,6 +249,10 @@ QStringList Utils::searchBanksOnDir(QString baseDir) {
         QFile file( completeBankFileName );
         if ( file.exists() )	{
             canAddBank = true;
+        }
+        else if ( dirsOnFolder.at(i) == APP_OLD_TRASH_DIR_NAME )  {
+            // Windows fork: a régi, adatmappán belüli lomtár (bankfájl nélkül) ne látsszon bankként
+            canAddBank = false;
         }
         else  {
             QDir presetsDir = QDir( baseDir + "/" + dirsOnFolder.at(i) );

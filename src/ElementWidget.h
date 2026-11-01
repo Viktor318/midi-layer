@@ -64,7 +64,7 @@ public:
     bool load(QString bankName, QString presetName, QString elementName);
     void setPresetName(QString presetName);
     void setBankName(QString bankName);     // Windows fork
-    void remove();
+    bool remove();     // Windows fork: false, ha nem sikerült lomtárba tenni (ilyenkor nincs törlés)
     void focusToName();
 
     void selectElement();

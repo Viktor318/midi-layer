@@ -50,7 +50,8 @@ AboutDialog::AboutDialog(QWidget *parent) :
 
     buildInfoHtml.append(this->buildLine(tr("Settings file"), APP_SETTINGS_FILE));
     buildInfoHtml.append(this->buildLine(tr("Data dir"), Utils::get()->getDataDir()));
-    buildInfoHtml.append(this->buildLine(tr("Trash dir"),QString("./%1").arg(APP_TRASH_DIR) ));
+    // Windows fork: a törölt elemek a rendszer lomtárába kerülnek; ez csak a tartalék lomtár
+    buildInfoHtml.append(this->buildLine(tr("Trash dir"), QString("system trash (fallback: %1)").arg(Utils::get()->getFallbackTrashDir()) ));
     buildInfoHtml.append(this->buildLine(tr("Bank file extension"), APP_DATA_BANK_EXTENSION));
     buildInfoHtml.append(this->buildLine(tr("Preset file extension"), APP_DATA_PRESET_EXTENSION));
     buildInfoHtml.append(this->buildLine(tr("Element file extension"), APP_DATA_ELEMENT_EXTENSION));

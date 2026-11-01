@@ -75,6 +75,15 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   - On preset change the tempo dial only appeared to change: its internal value stayed the
     old one, and the next time the metronome was switched on or off, this old tempo was
     stored in the new preset.
+- **Trash**: Deleted elements and presets now go to the Windows Recycle Bin, where they can
+  be restored to their original location. If the Recycle Bin is not available (e.g. on a
+  USB stick), the program copies them into a `trash` folder next to the data folder (by
+  timestamp / bank / preset) and deletes only after a successful copy; if that fails too,
+  nothing is deleted and a warning is shown. Bugs fixed: because of the old trash's
+  relative path the copy could fail while the deletion still happened (the element was
+  lost for good); deleting a preset did not put its elements into the trash; the trash
+  showed up as a bank called "trash" in the Open Bank list (the old `data/trash` folder
+  is now hidden).
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

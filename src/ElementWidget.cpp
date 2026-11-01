@@ -891,21 +891,20 @@ void ElementWidget::slotMidiOutChanged() {
 }
 
 
-void ElementWidget::remove()   {
+// Windows fork: az elemfájl a lomtárba kerül (lásd Utils::moveToTrash)
+bool ElementWidget::remove()   {
 
     // next IF is only necessary for prevents error in human presets edition
-    if (!this->elementName.isNull() || !this->elementName.isEmpty())    {
+    // (Windows fork: az eredeti feltétel - !isNull() || !isEmpty() - mindig igaz volt)
+    if (!this->elementName.isEmpty())    {
         if (ISLOGGABLE_INFO) LOG_INFO("Removing element \"" + this->elementName +"\"");
-        QString trashPath = Utils::get()->getPreferencesDir() + "/" + APP_TRASH_DIR;
-
-        /// TODO: Manage error making dir
-        QDir dir;
-        dir.mkpath(QString("%1/%2").arg(APP_TRASH_DIR).arg(this->presetName));
-
-        /// TODO: Manage move fail  (bool result = )
-        QFile::copy( buildElementPath(this->elementName), trashPath+"/"+this->presetName+"/"+this->elementName+APP_DATA_ELEMENT_EXTENSION );
-        QFile::remove( buildElementPath(this->elementName) );
+        if (!Utils::get()->moveToTrash( buildElementPath(this->elementName), this->bankName,
+                                        this->presetName + "/" + this->elementName + APP_DATA_ELEMENT_EXTENSION ))   {
+            QMessageBox::warning(this, APP_NAME, QString("Could not move element '%1' to the trash. Nothing was deleted.").arg(this->elementName));
+            return false;
+        }
     }
+    return true;
 }
 
 

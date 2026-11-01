@@ -73,7 +73,7 @@ public:
     void saveAll();
     void discardChanges();
 
-    void remove();
+    bool remove();     // Windows fork: false, ha nem sikerült lomtárba tenni (ilyenkor nincs törlés)
     bool createInitElementIfNecessary();
     QString getNotes();
     QString getCurrentElementName();

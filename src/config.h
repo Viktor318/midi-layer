@@ -24,7 +24,10 @@
 
 #define APP_SETTINGS_FILE           "midiLayer.ini"
 #define APP_DATA_DIR                "data"
-#define APP_TRASH_DIR               "data/trash"
+// Windows fork: tartalék lomtár az adatmappa MELLETT (nem benne), ha a rendszer lomtára nem
+// érhető el (lásd Utils::moveToTrash). Az eredeti "data/trash" az adatmappán belül volt.
+#define APP_TRASH_DIR               "trash"
+#define APP_OLD_TRASH_DIR_NAME      "trash"     // a régi, adatmappán belüli lomtár mappaneve
 #define APP_DATA_BANK_EXTENSION     ".mlb"
 #define APP_DATA_PRESET_EXTENSION   ".mlp"
 #define APP_DATA_ELEMENT_EXTENSION  ".mle"

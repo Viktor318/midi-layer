@@ -75,6 +75,14 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
     van kapcsolva).
   - Preset-váltáskor a tempótárcsa csak látszólag állt át: a belső értéke a régi maradt, és
     a metronóm következő be- vagy kikapcsolásakor ez a régi tempó került az új presetbe.
+- **Lomtár**: A törölt elemek és presetek a Windows Lomtárába kerülnek, ahonnan eredeti
+  helyükre visszaállíthatók. Ha a Lomtár nem érhető el (pl. pendrive-on), a program az
+  adatmappa melletti `trash` mappába másol (időbélyeg / bank / preset szerint), és csak
+  sikeres másolás után töröl; ha ez sem sikerül, nem töröl semmit, és figyelmeztet.
+  Javított hibák: a régi lomtár relatív útvonala miatt a másolás meghiúsulhatott, a
+  törlés viszont megtörtént (az elem véglegesen elveszett); preset törlésekor az elemek
+  nem jutottak a lomtárba; a lomtár „trash” nevű bankként jelent meg a bankmegnyitó
+  listában (a régi `data/trash` mappa most rejtve marad).
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

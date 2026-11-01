@@ -601,8 +601,10 @@ void PresetWidget::slotDeleteElement()  {
         return;
 
     ElementWidget * element = (ElementWidget *) tabElement->widget(tabElement->currentIndex());
+    // Windows fork: ha a lomtárba tétel nem sikerül, az elem marad
+    if (!element->remove())
+        return;
     tabElement->removeTab(tabElement->currentIndex());
-    element->remove();
     delete element;
     this->createInitElementIfNecessary();
     this->setEdited(true);
@@ -735,35 +737,26 @@ QString PresetWidget::getElementCloneName(QString pretendedName)   {
 }
 
 
-void PresetWidget::remove()   {
+// Windows fork: a teljes presetmappa egyben kerül a lomtárba (lásd Utils::moveToTrash). Az eredeti
+// az elemeket egyenként törölte (a lomtárba jellemzően csak a presetfájl jutott), és ha a
+// másolás nem sikerült, az elemek akkor is elvesztek.
+bool PresetWidget::remove()   {
 
-    QString presetName = this->nameEdit->text();
-    if (ISLOGGABLE_INFO) LOG_INFO("Removing preset \"" + presetName +"\"");
+    if (ISLOGGABLE_INFO) LOG_INFO("Removing preset \"" + this->presetName +"\"");
 
-    QString trashPath = Utils::get()->getPreferencesDir() + "/" + APP_TRASH_DIR;
-    if (ISLOGGABLE_TRACE) LOG_TRACE("Moving \""+presetName+"\" to trash (\""+trashPath+"\").");
+    QString presetDir = this->buildPresetPath(this->presetName);
+    if (!Utils::get()->moveToTrash(presetDir, this->bankName, this->presetName))   {
+        QMessageBox::warning(this, APP_NAME, QString("Could not move preset '%1' to the trash. Nothing was deleted.").arg(this->presetName));
+        return false;
+    }
 
-    // Remove child elements
+    // A fájlok már a lomtárban vannak, csak a felület elemei törlődnek
     for (int i=tabElement->count()-1; i > -1 ; i--)  {
         ElementWidget * element = (ElementWidget *) tabElement->widget(i);
         tabElement->removeTab(i);
-        element->remove();
         delete element;
     }
-
-    // Remove preset
-
-    QString presetDir = this->buildPresetPath(this->presetName);
-    QString trashDir = trashPath+"/"+this->presetName;
-
-    bool copySuccess = Utils::get()->copyDir(presetDir, trashDir, true);
-
-    if (copySuccess)    {
-        Utils::get()->removeDir( presetDir );
-    } else  {
-        if (ISLOGGABLE_ERROR) LOG_ERROR("Error moving \"" +presetName + "\" to trash dir.");
-    }
-
+    return true;
 }
 
 

@@ -55,6 +55,9 @@ public:
     bool renameDir(QString oldName, QString newName);
     bool copyDir(const QString source, const QString destination, const bool override);
     bool removeDir(const QString &dirName);
+    // Windows fork: fájl vagy mappa áthelyezése a rendszer lomtárába, tartalékként a saját lomtárba
+    bool moveToTrash(QString path, QString bankName, QString relativeName);
+    QString getFallbackTrashDir();
     // Search bank dirs
     QStringList getBanksOnDir(QString baseDir);
     // Search bank dirs and files and potencial dirs (dirs structure without bank settings).
