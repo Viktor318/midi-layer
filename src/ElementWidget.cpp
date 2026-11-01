@@ -155,6 +155,16 @@ ElementWidget::~ElementWidget()
 
 void ElementWidget::setupGuiConnections()  {
 
+    // Windows fork: az összekötések egyszer jönnek létre. A függvényt a load() és az initialize()
+    // is meghívja, így az elem visszavonásakor (újratöltés) és minden duplikált elemnél (betöltés +
+    // inicializálás) többször lefutott: minden jel többször kötődött be, a hangerő, a program, a
+    // bank és a SysEx küldése többször ment ki, és az ELEMENT felirat is többször jött létre.
+    // Az első hívásnak a betöltés utánra kell esnie (ahogy eddig), hogy a betöltéskor beállított
+    // értékek ne jelöljék szerkesztettnek az elemet, és ne küldjenek MIDI-üzenetet.
+    if (this->guiConnectionsDone)
+        return;
+    this->guiConnectionsDone = true;
+
     connect(ui->buttonEnable, SIGNAL(released()), this, SLOT(slotMarkEdited()));
     connect(ui->cbResetChannelOnUnselect, SIGNAL(clicked()), this, SLOT(slotMarkEdited()));
     connect(ui->lName, SIGNAL(editingFinished()), this, SLOT(slotNameChanged()) );

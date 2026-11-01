@@ -50,6 +50,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - **Hibajavítás**: A bank átnevezése után a megnyitott preset és elemei a régi banknévvel
   mentettek: a program a régi néven új mappát hozott létre, az átnevezett bankban pedig a
   régi állapot maradt. Most az átnevezés után a mentés az új bankba kerül.
+- **Hibajavítás**: Egy elem visszavonása (Revert) után, illetve a duplikált elemeknél a
+  hangerő-csúszka, a program- és banktárcsa és a SysEx-küldő gomb minden üzenetet
+  többször küldött ki, és az ELEMENT felirat is többször jött létre. Most a felület
+  vezérlői elemenként egyszer kötődnek be.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

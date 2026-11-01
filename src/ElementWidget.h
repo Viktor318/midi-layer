@@ -87,6 +87,7 @@ private:
 
     bool edited;
     bool savePresetOnSave;
+    bool guiConnectionsDone = false;    // Windows fork: a setupGuiConnections csak egyszer fusson le
 
     Led * ledIn;
     Led * ledOut;
