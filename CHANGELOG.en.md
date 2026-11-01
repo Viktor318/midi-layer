@@ -42,6 +42,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   The program now detects when the instance that created the lock file is no longer
   running, and removes it automatically. The lock file is now called `MidiLayer.lock`
   instead of `MidiLayer.pid`.
+- **Bugfix**: Renaming an element to the name of another element in the same preset
+  silently overwrote the other element's settings on save. The program now warns that
+  the name is already used and restores the old name (case-insensitive).
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

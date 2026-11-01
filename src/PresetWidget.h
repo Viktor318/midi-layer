@@ -56,6 +56,7 @@ public:
     virtual void updateSelectedTabName(QString tabName);
     virtual void updateTabIcon(QString elementName);
     virtual void setSelectedElement(QString elementName);
+    virtual bool isElementNameTaken(QString elementName, QWidget * exceptElement);   // Windows fork
 
     void setBankName(QString bankName);
     void setName(QString presetName);

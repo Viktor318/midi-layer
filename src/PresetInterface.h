@@ -29,6 +29,8 @@ class PresetInterface
         virtual void updateSelectedTabName(QString tabName) = 0;
         virtual void updateTabIcon(QString elementName) = 0;
         virtual void setSelectedElement(QString elementName) = 0;
+        // Windows fork: foglalt-e a név a preset egy másik eleménél (kis- és nagybetű nem számít)
+        virtual bool isElementNameTaken(QString elementName, QWidget * exceptElement) = 0;
 };
 
 #endif // PRESETINTERFACE_H

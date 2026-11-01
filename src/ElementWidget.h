@@ -120,6 +120,7 @@ private:
     void buildAndAsignLeds();
     void setEdited(bool edited);
     bool renameIfNedded();
+    bool isNameConflict(QString newName);     // Windows fork
     QString getDirPath();
 
     Led * ledNoteYes;

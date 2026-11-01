@@ -44,6 +44,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   instance is running”), amíg kézzel ki nem töröltük az ideiglenes mappában maradt
   zárolófájlt. Most a program felismeri, ha a zárolófájlt létrehozó példány már nem fut,
   és magától eltávolítja. A zárolófájl neve `MidiLayer.pid` helyett `MidiLayer.lock`.
+- **Hibajavítás**: Ha egy elemet a preset egy másik elemének nevére neveztünk át, a mentés
+  szó nélkül felülírta a másik elem beállításait. Most a program figyelmeztet, hogy a név
+  foglalt, és visszaállítja a régi nevet (a kis- és nagybetű nem számít).
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

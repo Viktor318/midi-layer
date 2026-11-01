@@ -654,6 +654,15 @@ void ElementWidget::slotNameChanged() {
         return;
     }
 
+    // Windows fork: névütközés-ellenőrzés (lásd isNameConflict)
+    if (this->isNameConflict(newName))   {
+        disconnect(ui->lName, SIGNAL(editingFinished()), this, SLOT(slotNameChanged()) );
+        QMessageBox::warning(this, APP_NAME, QString("Element '%1' already exists in this preset.").arg(newName));
+        ui->lName->setText(oldName);
+        connect(ui->lName, SIGNAL(editingFinished()), this, SLOT(slotNameChanged()) );
+        return;
+    }
+
     this->slotMarkEdited();
     this->savePresetOnSave = true;
 
@@ -1195,8 +1204,30 @@ void ElementWidget::processPitchBend(ChannelMessage channelMessage)  {
 }
 
 
+// Windows fork: az eredeti program nem ellenőrizte, hogy az új név szabad-e. Ha a preset egy
+// másik elemének nevét adtuk meg, a fájl átnevezése csendben meghiúsult (a cél már létezett),
+// a mentés viszont az új néven írt - vagyis a másik elem beállításait írta felül, a régi fájl
+// gazdátlanul maradt, a presetben pedig két azonos nevű elem szerepelt.
+bool ElementWidget::isNameConflict(QString newName)   {
+    // a saját név (akár csak kis- és nagybetűben eltérve) nem ütközés
+    if (newName.compare(this->elementName, Qt::CaseInsensitive) == 0)
+        return false;
+    if (this->presetInterface != NULL && this->presetInterface->isElementNameTaken(newName, this))
+        return true;
+    // a lemezen már létező, de a presetbe nem betöltött elemfájl is foglalt
+    return QFile::exists( this->getDirPath() + "/" + newName + APP_DATA_ELEMENT_EXTENSION );
+}
+
+
 bool ElementWidget::renameIfNedded()    {
     if (this->elementName != ui->lName->text())   {
+        // Windows fork: biztonsági háló - ha a mező elhagyásakor az ellenőrzés nem futott le,
+        // ütközéskor a mentett név áll vissza, és nincs átnevezés
+        if (!this->elementName.isEmpty() && this->isNameConflict(ui->lName->text()))   {
+            if (ISLOGGABLE_WARN) LOG_WARN(QString("Element name '%1' is already used, keeping '%2'").arg(ui->lName->text(), this->elementName));
+            ui->lName->setText(this->elementName);
+            return false;
+        }
         if (!this->elementName.isEmpty())    {
             // Rename file
             Utils::get()->renameFile( this->getDirPath() +"/"+this->elementName+APP_DATA_ELEMENT_EXTENSION, this->getDirPath() +"/"+ui->lName->text()+APP_DATA_ELEMENT_EXTENSION);

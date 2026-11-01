@@ -329,6 +329,22 @@ void PresetWidget::setSelectedElement(QString elementName) {
 }
 
 
+// Windows fork: az elemek átnevezésének ütközés-ellenőrzéséhez. Egy másik elem mentett neve
+// (a fül felirata) és a névmezőjében álló, még nem mentett név is foglaltnak számít. A kis- és
+// nagybetű nem számít, mert Windowson a "Piano" és a "piano" ugyanaz a fájl.
+bool PresetWidget::isElementNameTaken(QString elementName, QWidget * exceptElement)  {
+    for (int i=0; i<tabElement->count(); i++)    {
+        ElementWidget * element = (ElementWidget *) tabElement->widget(i);
+        if (element == exceptElement)
+            continue;
+        if ( tabElement->tabText(i).compare(elementName, Qt::CaseInsensitive) == 0
+             || element->getName().compare(elementName, Qt::CaseInsensitive) == 0 )
+            return true;
+    }
+    return false;
+}
+
+
 void PresetWidget::slotSave()   {
 
     if (presetName.isEmpty())   {
