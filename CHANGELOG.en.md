@@ -45,6 +45,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: Renaming an element to the name of another element in the same preset
   silently overwrote the other element's settings on save. The program now warns that
   the name is already used and restores the old name (case-insensitive).
+- **Bugfix**: After renaming a bank, the open preset and its elements kept saving under
+  the old bank name: the program created a new folder with the old name, while the renamed
+  bank kept the old state. Saving now goes to the renamed bank.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

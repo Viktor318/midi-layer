@@ -764,6 +764,12 @@ void ElementWidget::setPresetName(QString presetName)   {
 }
 
 
+// Windows fork: a bank átnevezésekor (lásd PresetWidget::setBankName)
+void ElementWidget::setBankName(QString bankName)   {
+    this->bankName = bankName;
+}
+
+
 void ElementWidget::slotVolumeChanged(int value)    {
     if (ui->buttonEnable->isChecked())  {
         MidiManager::get()->sendController(ui->cbPortOut->currentIndex(), ui->sbMidiOutChannel->value()-1,CTL_VOLUME,value);

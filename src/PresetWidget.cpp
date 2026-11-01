@@ -160,8 +160,13 @@ PresetWidget::~PresetWidget()   {
 }
 
 
+// Windows fork: az elemek is megkapják az új banknevet - a bank átnevezése után a mentés
+// különben a régi, már nem létező mappába írt (lásd PresetsListWidget::slotBankNameChanged).
 void PresetWidget::setBankName(QString bankName)  {
     this->bankName = bankName;
+    for (int i=0; i<tabElement->count(); i++)    {
+        ((ElementWidget *) tabElement->widget(i))->setBankName(bankName);
+    }
 }
 
 

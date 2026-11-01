@@ -47,6 +47,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - **Hibajavítás**: Ha egy elemet a preset egy másik elemének nevére neveztünk át, a mentés
   szó nélkül felülírta a másik elem beállításait. Most a program figyelmeztet, hogy a név
   foglalt, és visszaállítja a régi nevet (a kis- és nagybetű nem számít).
+- **Hibajavítás**: A bank átnevezése után a megnyitott preset és elemei a régi banknévvel
+  mentettek: a program a régi néven új mappát hozott létre, az átnevezett bankban pedig a
+  régi állapot maradt. Most az átnevezés után a mentés az új bankba kerül.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

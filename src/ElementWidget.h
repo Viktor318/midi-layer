@@ -63,6 +63,7 @@ public:
 
     bool load(QString bankName, QString presetName, QString elementName);
     void setPresetName(QString presetName);
+    void setBankName(QString bankName);     // Windows fork
     void remove();
     void focusToName();
 

@@ -675,13 +675,19 @@ void PresetsListWidget::slotBankNameChanged()   {
     bool renameFile = Utils::get()->renameFile( newDirName+"/"+oldName+APP_DATA_BANK_EXTENSION, newDirName+"/"+newName+APP_DATA_BANK_EXTENSION );
     if (!renameFile) {
         // Replace dir name
-       Utils::get()->renameFile(newDirName,oldDirName);
+        // Windows fork: mappát a renameDir nevez át (eredetileg renameFile volt)
+       Utils::get()->renameDir(newDirName,oldDirName);
        this->changeBankNameEditProgramaticly(oldName);
        if (ISLOGGABLE_ERROR) LOG_ERROR("Could not change file name \""+oldName+APP_DATA_BANK_EXTENSION +"\" to \""+ newName+APP_DATA_BANK_EXTENSION+"\"");
        return;
     }
 
     this->bankName = newName;
+    // Windows fork: a megnyitott preset és elemei is az új bankba mentsenek. Eredetileg a régi
+    // banknevet tartották meg, és a következő mentés (kilépéskor a preset automatikusan is ment)
+    // a régi néven újra létrehozott mappába írt, az átnevezett bankban pedig a régi állapot maradt.
+    if (currentPreset)
+        currentPreset->setBankName(newName);
     this->updateTooltip();
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("Change bank name from \""+oldName +"\" to \""+ newName+"\"");
     emit bankNameChanged(oldName, newName);
