@@ -57,6 +57,14 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   names with those letters replaced by '?'. Names are now stored unchanged. The log file
   is now UTF-8 too. (A device saved incorrectly before has to be selected once more in
   MIDI Setup.)
+- **Unsaved changes**: Until now, unsaved element changes were silently lost on preset
+  change, while on exit and bank change the preset-level data (element order, metronome)
+  was saved without asking. Now:
+  - on a manual preset change (in the list), when creating a new preset, on bank change
+    and on exit the program asks: Save / Discard / Cancel;
+  - on a preset change by Program Change it does not ask (nobody can answer during a live
+    performance) and does not save: the changes are lost, and this is logged;
+  - in the preset list, a preset with unsaved changes is marked with an asterisk (*).
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

@@ -68,6 +68,11 @@ public:
     void setActive(bool active);
     bool isActive();
 
+    // Windows fork: mentetlen módosítások kezelése (lásd PresetsListWidget::confirmUnsavedChanges)
+    bool hasUnsavedChanges();
+    void saveAll();
+    void discardChanges();
+
     void remove();
     bool createInitElementIfNecessary();
     QString getNotes();
@@ -127,6 +132,7 @@ private:
     void putElementInTab(ElementWidget * element);
     void setEdited(bool edited);
     bool edited;
+    bool changesDiscarded = false;     // Windows fork: elvetett módosítások, a preset már nem ment
 
     LinkButton * forkButton;
     LinkButton * buildForkButton();
@@ -157,6 +163,7 @@ signals:
 
     void nameChanged(QString oldName, QString newName);
     void reverted();
+    void editedStateChanged();     // Windows fork: a preset vagy egy eleme szerkesztett / mentett lett
 
 };
 

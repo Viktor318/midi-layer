@@ -27,6 +27,9 @@
 #include <QDir>
 #include <QFile>
 #include <QValidator>
+#include <QTimer>
+#include <QSignalBlocker>
+#include <QStyledItemDelegate>
 
 #include "Logger.h"
 #include "config.h"
@@ -57,6 +60,9 @@ public:
     QString getCurrentPresetPath();
     void sort(); // Not used
     int getPresetListFontSize();
+    // Windows fork: mentetlen módosításoknál kérdés (Mentés / Elvetés / Mégse); false = Mégse
+    bool confirmUnsavedChanges(QString question);
+    bool needsUnsavedChangesConfirm();
 
 private:
 
@@ -84,6 +90,11 @@ private:
     QFont listFont;
 
     QWidget * bankLabelTag;
+
+    // Windows fork: mentetlen módosítások kezelése preset-váltáskor
+    bool presetChangeByProgramChange = false;
+    bool manualPresetChangePending = false;
+    bool unsavedChangesDialogOpen = false;
 
     QPushButton * buildActionButton(QString toolTip, QString resourceName);
     QPushButton * buildCheckableButton(QString toolTip, QString resourceName, QString resourceClickedName);
@@ -118,6 +129,8 @@ public slots:
 private slots:
 
     void slotChangePresetByProgramChange(int programChangeValue);
+    void slotConfirmManualPresetChange();       // Windows fork
+    void slotUpdateUnsavedMark();               // Windows fork
     void slotPresetReverted();
     void slotPreservePresetOrder(bool preserve);
     void slotBankNameChanged();

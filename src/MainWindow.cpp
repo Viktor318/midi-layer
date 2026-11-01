@@ -415,6 +415,10 @@ void MainWindow::openBank(QString bankName)
         if (ISLOGGABLE_ERROR) LOG_ERROR("Invalid name for bank open");
         return;
     }
+    // Windows fork: mentetlen módosításoknál kérdés (eredetileg a preset-szintű adatok szó
+    // nélkül mentődtek, az elemek módosításai elvesztek)
+    if (!presetsWidget->confirmUnsavedChanges(tr("Do you want to save them before changing bank?")))
+        return;
     this->saveActiveBank();
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("loading bank '"+bankName+"'");
     presetsWidget->slotChangePreset(-1);
@@ -428,6 +432,9 @@ void MainWindow::openBank(QString bankName)
 
 void MainWindow::slotNewBank(void)
 {
+    // Windows fork: mentetlen módosításoknál kérdés
+    if (!presetsWidget->confirmUnsavedChanges(tr("Do you want to save them before changing bank?")))
+        return;
     this->saveActiveBank();
     QString bankName = Utils::get()->getCloneName("new bank", Utils::get()->getBanksOnDir( Utils::get()->getDataDir() ) );
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("new bank '"+bankName+"'");
@@ -442,6 +449,9 @@ void MainWindow::slotNewBank(void)
 
 void MainWindow::slotCloneBank(void)
 {
+    // Windows fork: mentetlen módosításoknál kérdés (a másolat a lemezről készül)
+    if (!presetsWidget->confirmUnsavedChanges(tr("Do you want to save them before duplicating the bank?")))
+        return;
     this->saveActiveBank();
     QString bankName = Utils::get()->getCloneName(this->activeBankName, Utils::get()->getBanksOnDir( Utils::get()->getDataDir() ) );
 
@@ -496,7 +506,15 @@ void MainWindow::exitApplication(void)  {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
 
-    if (Preferences::get()->getConfirmOnExit()) {
+    // Windows fork: mentetlen módosításoknál kérdés. Ha ez megjelent, a kilépés megerősítése
+    // (Preferences: confirm on exit) már nem kell külön.
+    bool unsavedAsked = presetsWidget->needsUnsavedChangesConfirm();
+    if (!presetsWidget->confirmUnsavedChanges(tr("Do you want to save them before exiting?")))   {
+        event->ignore();
+        return;
+    }
+
+    if (!unsavedAsked && Preferences::get()->getConfirmOnExit()) {
         int confirm = QMessageBox::question(this, tr("Exit program"),
                                         tr("\nAre you sure do you want exit %1?").arg( QApplication::applicationName() ),
                                         QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);

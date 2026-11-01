@@ -325,6 +325,8 @@ void PresetWidget::updateTabIcon(QString elementName)  {
         QIcon icon(Utils::get()->buildElementTabIconPath(element->isActive(), element->isEdited()));
         tabElement->setTabIcon(elementIndex, icon);
     }
+    // Windows fork: az elem szerkesztett állapota is megjelenik a presetlistában (csillag)
+    emit editedStateChanged();
 }
 
 
@@ -351,6 +353,12 @@ bool PresetWidget::isElementNameTaken(QString elementName, QWidget * exceptEleme
 
 
 void PresetWidget::slotSave()   {
+
+    // Windows fork: elvetett módosítások után nincs mentés (lásd discardChanges)
+    if (this->changesDiscarded)   {
+        if (ISLOGGABLE_DEBUG) LOG_DEBUG("Preset \"" + bankName + "/" + presetName + "\" not saved: changes were discarded");
+        return;
+    }
 
     if (presetName.isEmpty())   {
         if (ISLOGGABLE_ERROR) LOG_ERROR("Preset name is not defined");
@@ -417,6 +425,41 @@ void PresetWidget::slotUnselected()    {
 
 void PresetWidget::setActive(bool active) {
     this->active = active;
+}
+
+
+// Windows fork: van-e mentetlen módosítás a presetben vagy valamelyik elemében
+bool PresetWidget::hasUnsavedChanges()  {
+    if (this->changesDiscarded)
+        return false;
+    if (this->edited)
+        return true;
+    for (int i=0; i<tabElement->count(); i++)    {
+        if ( ((ElementWidget *) tabElement->widget(i))->isEdited() )
+            return true;
+    }
+    return false;
+}
+
+
+// Windows fork: minden mentetlen elem és maga a preset mentése
+void PresetWidget::saveAll()  {
+    for (int i=0; i<tabElement->count(); i++)    {
+        ElementWidget * element = (ElementWidget *) tabElement->widget(i);
+        if (element->isEdited())
+            element->slotSave();
+    }
+    this->slotSave();
+}
+
+
+// Windows fork: a módosítások elvetése. Csak közvetlenül a preset eldobása (preset- vagy
+// bankváltás, kilépés) előtt hívjuk: a preset ezután már nem ment, így a kilépéskor és
+// bankváltáskor egyébként automatikus mentés sem írja a fájlba az elvetett módosításokat.
+void PresetWidget::discardChanges()  {
+    if (ISLOGGABLE_INFO) LOG_INFO("Unsaved changes of preset \"" + bankName + "/" + presetName + "\" discarded");
+    this->changesDiscarded = true;
+    emit editedStateChanged();
 }
 
 
@@ -838,6 +881,7 @@ void PresetWidget::setEdited(bool edited)  {
     this->buttonSave->setEnabled(edited);
     this->buttonRevert->setVisible(edited);
     this->buttonSave->setVisible(edited);
+    emit editedStateChanged();      // Windows fork
 }
 
 

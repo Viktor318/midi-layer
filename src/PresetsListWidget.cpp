@@ -20,6 +20,23 @@
 #include "PresetsListWidget.h"
 
 
+// Windows fork: a presetlistában a mentetlen módosítású preset neve után csillag jelenik meg.
+// A csillag csak a megjelenítésben van, az elem szövege (a preset neve, amire a program sok
+// helyen támaszkodik) változatlan marad.
+#define PRESET_UNSAVED_ROLE (Qt::UserRole + 1)
+
+class UnsavedMarkDelegate : public QStyledItemDelegate  {
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+protected:
+    void initStyleOption(QStyleOptionViewItem * option, const QModelIndex & index) const override  {
+        QStyledItemDelegate::initStyleOption(option, index);
+        if (index.data(PRESET_UNSAVED_ROLE).toBool())
+            option->text += " *";
+    }
+};
+
+
 PresetsListWidget::PresetsListWidget(QWidget *parent, QWidget * centralWidget) :
     QWidget(parent)
 {
@@ -39,6 +56,7 @@ PresetsListWidget::PresetsListWidget(QWidget *parent, QWidget * centralWidget) :
     presetList->setStyleSheet(QString::fromUtf8("background-color: #25303d; color: #FFFFFF;"));
     presetList->setDragDropMode(QAbstractItemView::NoDragDrop);
     presetList->setDefaultDropAction(Qt::TargetMoveAction);
+    presetList->setItemDelegate(new UnsavedMarkDelegate(presetList));     // Windows fork
 
     bankNameEdit = new QLineEdit(this);
     QFont font;
@@ -124,6 +142,11 @@ void PresetsListWidget::slotPreservePresetOrder(bool preserve)    {
 
 void PresetsListWidget::slotChangePresetByProgramChange(int programChangeValue)    {
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("Changing preset by program change...");
+    // Windows fork: amíg a mentetlen módosításokra vonatkozó kérdés nyitva van, nincs váltás
+    if (this->unsavedChangesDialogOpen)   {
+        if (ISLOGGABLE_INFO) LOG_INFO(QString("Program change %1 ignored: unsaved changes dialog is open").arg(programChangeValue + 1));
+        return;
+    }
     // Windows fork: ha nincs ennyi preset, a Program Change-et figyelmen kívül hagyjuk, és az
     // aktuális preset marad. Az eredeti kód a tartományon kívüli sorszámot is átadta a
     // listának; ilyenkor a lista kijelölése megszűnt, a program leválasztotta az aktuális
@@ -133,14 +156,106 @@ void PresetsListWidget::slotChangePresetByProgramChange(int programChangeValue) 
                                       .arg(programChangeValue + 1).arg(presetList->count()));
         return;
     }
+    // Windows fork: Program Change-re nincs kérdés (élőben nincs, aki válaszoljon); a mentetlen
+    // módosítások elvesznek, ezt a slotChangePreset naplózza
+    this->presetChangeByProgramChange = true;
     presetList->setCurrentRow(programChangeValue);
+    this->presetChangeByProgramChange = false;
+}
+
+
+// Windows fork: kell-e kérdezni a mentetlen módosítások miatt
+bool PresetsListWidget::needsUnsavedChangesConfirm()   {
+    return currentPreset && currentPreset->isActive() && currentPreset->hasUnsavedChanges();
+}
+
+
+// Windows fork: mentetlen módosításoknál Mentés / Elvetés / Mégse. Igazat ad, ha folytatható a
+// művelet (nem volt mentetlen módosítás, vagy mentettük, vagy elvetettük), hamisat a Mégse-re.
+bool PresetsListWidget::confirmUnsavedChanges(QString question)   {
+    if (!this->needsUnsavedChangesConfirm())
+        return true;
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(APP_NAME);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString("Preset '%1' has unsaved changes.").arg(currentPreset->getName()));
+    msgBox.setInformativeText(question);
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    msgBox.setEscapeButton(QMessageBox::Cancel);
+
+    this->unsavedChangesDialogOpen = true;
+    int answer = msgBox.exec();
+    this->unsavedChangesDialogOpen = false;
+
+    if (answer == QMessageBox::Save)   {
+        currentPreset->saveAll();
+        return true;
+    }
+    if (answer == QMessageBox::Discard)   {
+        currentPreset->discardChanges();
+        return true;
+    }
+    return false;
 }
 
 
 void PresetsListWidget::slotChangePreset(int selectedRow)    {
     if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Slot change preset in row %1").arg(selectedRow));
+
+    // Windows fork: mentetlen módosítások. Program Change-re nincs kérdés, csak naplózás. Kézi
+    // váltásnál a kérdés egy pillanattal később jön (a lista egér- vagy billentyűesemény-
+    // kezelésének befejezése után), hogy Mégse esetén a régi sor tisztán visszaállítható legyen.
+    if ( this->needsUnsavedChangesConfirm()
+         && ( selectedRow < 0 || selectedRow >= presetList->count()
+              || presetList->item(selectedRow)->text() != currentPreset->getName() ) )   {
+        if (this->presetChangeByProgramChange)   {
+            if (ISLOGGABLE_INFO) LOG_INFO(QString("Preset changed by program change, unsaved changes of \"%1\" are lost").arg(currentPreset->getName()));
+        } else  {
+            if (!this->manualPresetChangePending)   {
+                this->manualPresetChangePending = true;
+                QTimer::singleShot(0, this, SLOT(slotConfirmManualPresetChange()));
+            }
+            return;
+        }
+    }
+
     this->presetList->setCurrentRow(selectedRow);
     this->changeToSelectedPreset();
+}
+
+
+// Windows fork: kézi preset-váltás mentetlen módosításokkal (lásd slotChangePreset)
+void PresetsListWidget::slotConfirmManualPresetChange()   {
+    this->manualPresetChangePending = false;
+
+    if (!currentPreset)
+        return;
+    int selectedRow = presetList->currentRow();
+    int currentPresetRow = this->getPresetListRow(currentPreset->getName());
+    if (selectedRow == currentPresetRow && currentPresetRow > -1)
+        return;     // közben visszaléptünk az aktuális presetre
+
+    if (this->confirmUnsavedChanges("Do you want to save them before switching to another preset?"))   {
+        this->changeToSelectedPreset();
+    } else  {
+        // Mégse: a régi preset marad kijelölve
+        QSignalBlocker blocker(presetList);
+        presetList->setCurrentRow(currentPresetRow);
+    }
+}
+
+
+// Windows fork: a csillag frissítése a presetlistában
+void PresetsListWidget::slotUpdateUnsavedMark()   {
+    bool unsaved = currentPreset && currentPreset->isActive() && currentPreset->hasUnsavedChanges();
+    for (int i=0; i<presetList->count(); i++)    {
+        QListWidgetItem * item = presetList->item(i);
+        bool mark = unsaved && item->text() == currentPreset->getName();
+        if (item->data(PRESET_UNSAVED_ROLE).toBool() != mark)
+            item->setData(PRESET_UNSAVED_ROLE, mark);
+    }
 }
 
 
@@ -187,7 +302,9 @@ void PresetsListWidget::selectPreset(QString selectedPreset)  {
     this->sendInfoToMetronome();
     connect(currentPreset, SIGNAL(nameChanged(QString,QString)), this, SLOT(slotPresetNameChanged(QString,QString)));
     connect(currentPreset, SIGNAL(reverted()), this, SLOT(slotPresetReverted()));
+    connect(currentPreset, SIGNAL(editedStateChanged()), this, SLOT(slotUpdateUnsavedMark()));
     lastPresetSelected = selectedPreset;
+    this->slotUpdateUnsavedMark();
 }
 
 
@@ -462,6 +579,7 @@ void PresetsListWidget::slotPresetNameChanged(QString oldName, QString newName) 
             this->presetList->item(i)->setToolTip(newName);
             this->currentPreset->setName(newName);
             this->sendInfoToMetronome();
+            this->slotUpdateUnsavedMark();      // Windows fork
             return;
         }
     }
@@ -589,6 +707,9 @@ void PresetsListWidget::newPresetFrom(QString presetCompleteName) {
 
     if (ISLOGGABLE_INFO) LOG_INFO("Creating new preset from \"" + presetCompleteName +"\"");
     //currentPreset->save();
+    // Windows fork: a másolat a lemezről készül, és utána az új presetre váltunk
+    if (!this->confirmUnsavedChanges("Do you want to save them before creating a new preset?"))
+        return;
 
     QFileInfo pathInfo( presetCompleteName );
     QString presetName = pathInfo.fileName();
@@ -619,6 +740,9 @@ void PresetsListWidget::newPresetFrom(QString presetCompleteName) {
 void PresetsListWidget::slotAddPreset()  {
 
     if (ISLOGGABLE_INFO) LOG_INFO("Adding new preset");
+    // Windows fork: utána az új presetre váltunk
+    if (!this->confirmUnsavedChanges("Do you want to save them before creating a new preset?"))
+        return;
 
     int presetsCount = this->presetList->count();
     int row = -1;
