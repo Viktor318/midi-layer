@@ -104,6 +104,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   ha semmi nem változott: a szóló hangok elnémulhattak, és az aktív elemek hangszer-
   beállításai is újra kimentek. Most csak a ténylegesen megváltozott slot portja nyílik
   újra (vagy az, amelyiknek az eszköze közben más sorszámot kapott, pl. újradugás után).
+- **Hibajavítás**: Ha egy presetben két elem ugyanazt a billentyűt ugyanarra a kimenetre,
+  csatornára és hangra küldte, két Note On ment ki, de a felengedéskor csak egy Note Off;
+  egyes hangszereken így egy hang szólva maradt. Most ilyenkor két Note Off megy ki.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

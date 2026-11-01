@@ -809,8 +809,10 @@ void MidiManager::resetAllControllers() {
 void MidiManager::registerSoundingNote(int inSlot, int inChannel, int inNote, int outSlot, int outChannel, int outNote)    {
     OutTarget target = { outSlot, outChannel, outNote };
     QList<OutTarget> & targets = soundingNotes[trackKey(inSlot, inChannel, inNote)];
-    if (!targets.contains(target))
-        targets.append(target);
+    // Windows fork: ugyanaz a cél többször is bekerülhet. Ha egy presetben két elem ugyanazt a
+    // billentyűt ugyanarra a kimenetre, csatornára és hangra küldi, két Note On megy ki; így a
+    // felengedéskor két Note Off is megy (eddig csak egy, és egyes hangszereken egy hang szólva maradt).
+    targets.append(target);
 }
 
 

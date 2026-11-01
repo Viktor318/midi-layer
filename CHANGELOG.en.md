@@ -106,6 +106,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   changed: sounding notes could be cut off, and the instrument settings of the active
   elements were resent. Now only the port of a slot that actually changed is reopened (or
   one whose device got a different index meanwhile, e.g. after replugging).
+- **Bugfix**: If two elements of a preset sent the same key to the same output, channel and
+  note, two Note Ons were sent but only one Note Off on release; on some instruments a note
+  kept sounding. Two Note Offs are sent in this case now.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
