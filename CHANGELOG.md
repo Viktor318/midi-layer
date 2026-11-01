@@ -97,6 +97,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   `midiLayer.ini`, vagy a legutóbbi bank mappája már nem létezik), a program bank nélkül
   indult, és egy új preset az adatmappa gyökerébe került. Most az első meglévő bank nyílik
   meg, ennek híján egy új bank jön létre; bank nélkül nem lehet presetet létrehozni.
+- A frissítésfigyelő kikapcsolva: az eredeti szerző SourceForge-projektjének kiadásait
+  figyelte (titkosítatlan http-n), így a fork felhasználóinak az eredeti változatot
+  ajánlotta volna. A beállítás („Check for updates at startup”) rejtve.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

@@ -27,6 +27,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->autoShowHideMonitors->setVisible(false);
+    // Windows fork: a frissítésfigyelő ki van kapcsolva (lásd MainWindow), a beállítása rejtve
+    ui->cbCheckUpdates->setVisible(false);
 
     connect(this, SIGNAL( accepted() ), this, SLOT( slotApplySetup() ) );
 }

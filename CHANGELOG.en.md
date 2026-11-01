@@ -99,6 +99,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   a bank, and a new preset was created in the root of the data folder. Now the first
   existing bank is opened, or a new bank is created if there is none; presets cannot be
   created without a bank.
+- Update check disabled: it watched the original author's SourceForge releases (over
+  plain http), so it would have offered the original version to users of this fork. The
+  setting ("Check for updates at startup") is hidden.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

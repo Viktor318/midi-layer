@@ -113,8 +113,11 @@ MainWindow::MainWindow(QApplication */*parent*/)
 
     Utils::get()->setMainWindowReady(true);
 
-    UpdateNotifier * updateNotifier = new UpdateNotifier(this);
-    updateNotifier->start();
+    // Windows fork: a frissítésfigyelő kikapcsolva. Az eredeti szerző SourceForge-projektjének
+    // kiadásait figyelte (titkosítatlan http-n), így a fork felhasználóinak az eredeti, a fork
+    // javításait nem tartalmazó változatot ajánlotta volna; a verziószám feldolgozása is hibás.
+    // UpdateNotifier * updateNotifier = new UpdateNotifier(this);
+    // updateNotifier->start();
 
 }
 
