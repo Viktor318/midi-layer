@@ -418,7 +418,9 @@ bool MidiManager::isAlreadyOpenPort(QString portName)    {
 QString MidiManager::getInPortNameAtSlot(int slotIndex)  {
     try {
         if(portInInterfaceIndex.at(slotIndex)>-1)
-            return QString::fromStdString( midiInList.at(slotIndex)->getPortName(portInInterfaceIndex.at(slotIndex)) ).toLatin1();
+            // Windows fork: a név változatlanul (UTF-8-ból); az eredeti .toLatin1() a Latin-1-en kívüli
+            // betűket (pl. ő, ű) '?'-re cserélte, így a mentett név nem egyezett az eszközlistával
+            return QString::fromStdString( midiInList.at(slotIndex)->getPortName(portInInterfaceIndex.at(slotIndex)) );
     }
     catch (RtError& error) {
         error.printMessage();
@@ -431,7 +433,9 @@ QString MidiManager::getInPortNameAtSlot(int slotIndex)  {
 QString MidiManager::getOutPortNameAtSlot(int slotIndex)  {
     try {
         if(portOutInterfaceIndex.at(slotIndex)>-1)
-            return QString::fromStdString( midiOutList.at(slotIndex)->getPortName(portOutInterfaceIndex.at(slotIndex)) ).toLatin1();
+            // Windows fork: a név változatlanul (UTF-8-ból); az eredeti .toLatin1() a Latin-1-en kívüli
+            // betűket (pl. ő, ű) '?'-re cserélte, így a mentett név nem egyezett az eszközlistával
+            return QString::fromStdString( midiOutList.at(slotIndex)->getPortName(portOutInterfaceIndex.at(slotIndex)) );
     }
     catch (RtError& error) {
         error.printMessage();

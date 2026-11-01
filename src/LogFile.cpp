@@ -114,7 +114,8 @@ void LogFile::run (void) {
             str	= logData.takeFirst();
             mutex.unlock();
             QCoreApplication::processEvents();
-            logFile.write( str.toLatin1().constData() );
+            // Windows fork: UTF-8, hogy az ékezetes eszköz- és presetnevek se legyenek '?' a naplóban
+            logFile.write( str.toUtf8() );
         }
         logFile.flush();
         QCoreApplication::processEvents(QEventLoop::AllEvents);

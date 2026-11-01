@@ -54,6 +54,11 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   hangerő-csúszka, a program- és banktárcsa és a SysEx-küldő gomb minden üzenetet
   többször küldött ki, és az ELEMENT felirat is többször jött létre. Most a felület
   vezérlői elemenként egyszer kötődnek be.
+- **Hibajavítás**: Az olyan MIDI-eszközök, amelyek nevében Latin-1-en kívüli betű (pl. ő, ű)
+  van, indításkor nem álltak vissza a slotjukba („[not defined]”), mert a program a nevüket
+  '?'-re cserélt betűkkel mentette. Most a név változatlanul kerül a beállításokba. A
+  naplófájl is UTF-8 kódolású lett. (A korábban hibásan mentett eszközt egyszer újra ki
+  kell választani a MIDI Setupban.)
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

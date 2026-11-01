@@ -52,6 +52,11 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   the program and bank dials and the SysEx send buttons sent every message several times,
   and the ELEMENT label was created more than once. The controls are now connected only
   once per element.
+- **Bugfix**: MIDI devices with letters outside Latin-1 in their names (e.g. ő, ű) were not
+  restored to their slots on startup ("[not defined]"), because the program saved their
+  names with those letters replaced by '?'. Names are now stored unchanged. The log file
+  is now UTF-8 too. (A device saved incorrectly before has to be selected once more in
+  MIDI Setup.)
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
