@@ -164,9 +164,11 @@ void MidiManager::init()  {
         midiInList.append(0);
         portInInterfaceIndex.append(-1);
         portInOpened.append(false);
+        openedInPortNames.append(QString());      // Windows fork
 
         midiOutList.append(0);
         portOutInterfaceIndex.append(-1);
+        openedOutPortNames.append(QString());     // Windows fork
 
         // Used for store callback slot index as user data
         portSlotIndex[i]=i;
@@ -305,6 +307,17 @@ void MidiManager::setMidiInSelected(int slotIndex, QString portName)   {
     QMap<QString,int> availableInPorts = getAvailableInPorts();
     // if (ISLOGGABLE_TRACE) LOG_TRACE(QString("Required '%1'' to SLOT%2 available IN ports %3").arg(portName).arg(slotIndex).arg(Utils::get()->toString(availableInPorts.keys())) );
 
+    // Windows fork: ha a slot beállítása nem változott, a port nyitva marad. Eredetileg a MIDI Setup
+    // "OK"-ja minden portot lezárt és újranyitott, akkor is, ha semmi nem változott. Ha az eszköz
+    // sorszáma közben megváltozott (pl. kihúzták és újra bedugták), a port újranyílik.
+    bool wantOpen = !portName.trimmed().isEmpty() && availableInPorts.contains(portName);
+    if ( wantOpen ? ( midiInList.at(slotIndex) && openedInPortNames.at(slotIndex) == portName
+                      && portInInterfaceIndex.at(slotIndex) == availableInPorts.value(portName) )
+                  : ( midiInList.at(slotIndex) == 0 ) )  {
+        if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("IN slot %1 unchanged").arg(slotIndex));
+        return;
+    }
+
     try {
         closeAndDeleteInPortAtSlot(slotIndex);
         if ( !portName.trimmed().isEmpty() && availableInPorts.contains(portName) )   {
@@ -314,6 +327,7 @@ void MidiManager::setMidiInSelected(int slotIndex, QString portName)   {
             midiInList.at(slotIndex)->ignoreTypes(false, false, false);
             midiInList.at(slotIndex)->setCallback( &midiCallback, &portSlotIndex[slotIndex] );
             portInInterfaceIndex.replace(slotIndex, availableInPorts.value(portName));
+            openedInPortNames.replace(slotIndex, portName);     // Windows fork
             if (ISLOGGABLE_INFO) LOG_INFO(QString("MIDI IN at slot %1 is assigned to interface %2").arg(slotIndex).arg(portName));
         }
         else  {
@@ -339,6 +353,7 @@ void MidiManager::closeAndDeleteInPortAtSlot(int slotIndex)   {
         }
         portInInterfaceIndex.replace(slotIndex, -1);
         midiInList.replace(slotIndex,0);
+        openedInPortNames.replace(slotIndex, QString());        // Windows fork
     }
     catch (RtError& error) {
         error.printMessage();
@@ -358,12 +373,23 @@ void MidiManager::setMidiOutSelected(int slotIndex, QString portName)   {
     if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Required config OUT slot %1 with interface %2").arg(slotIndex).arg(portName));
     QMap<QString,int> availableOutPorts = getAvailableOutPorts();
 
+    // Windows fork: változatlan beállításnál a port nyitva marad (lásd setMidiInSelected). A kimenet
+    // lezárása elnémíthatta a szóló hangokat, és az aktív elemek hangszer-beállításai is újra kimentek.
+    bool wantOpen = !portName.trimmed().isEmpty() && availableOutPorts.contains(portName);
+    if ( wantOpen ? ( midiOutList.at(slotIndex) && openedOutPortNames.at(slotIndex) == portName
+                      && portOutInterfaceIndex.at(slotIndex) == availableOutPorts.value(portName) )
+                  : ( midiOutList.at(slotIndex) == 0 ) )  {
+        if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("OUT slot %1 unchanged").arg(slotIndex));
+        return;
+    }
+
     try {
         closeAndDeleteOutPortAtSlot(slotIndex);
         if ( !portName.trimmed().isEmpty() && availableOutPorts.contains(portName) )   {
             midiOutList.replace(slotIndex, new RtMidiOut(portName.toStdString() ));
             midiOutList.at(slotIndex)->openPort(availableOutPorts.value(portName));
             portOutInterfaceIndex.replace(slotIndex, availableOutPorts.value(portName));
+            openedOutPortNames.replace(slotIndex, portName);    // Windows fork
             if (ISLOGGABLE_INFO) LOG_INFO(QString("MIDI OUT at slot %1 is assigned to interface %2").arg(slotIndex).arg(portName));            
         }
         else  {
@@ -386,6 +412,7 @@ void MidiManager::closeAndDeleteOutPortAtSlot(int slotIndex)   {
         }
         portOutInterfaceIndex.replace(slotIndex, -1);
         midiOutList.replace(slotIndex,0);
+        openedOutPortNames.replace(slotIndex, QString());       // Windows fork
     }
     catch (RtError& error) {
         error.printMessage();

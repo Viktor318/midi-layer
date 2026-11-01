@@ -102,6 +102,10 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - Update check disabled: it watched the original author's SourceForge releases (over
   plain http), so it would have offered the original version to users of this fork. The
   setting ("Check for updates at startup") is hidden.
+- **Bugfix**: The MIDI Setup "OK" button closed and reopened every port even if nothing had
+  changed: sounding notes could be cut off, and the instrument settings of the active
+  elements were resent. Now only the port of a slot that actually changed is reopened (or
+  one whose device got a different index meanwhile, e.g. after replugging).
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

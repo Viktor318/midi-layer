@@ -100,6 +100,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 - A frissítésfigyelő kikapcsolva: az eredeti szerző SourceForge-projektjének kiadásait
   figyelte (titkosítatlan http-n), így a fork felhasználóinak az eredeti változatot
   ajánlotta volna. A beállítás („Check for updates at startup”) rejtve.
+- **Hibajavítás**: A MIDI Setup „OK” gombja minden portot lezárt és újranyitott, akkor is,
+  ha semmi nem változott: a szóló hangok elnémulhattak, és az aktív elemek hangszer-
+  beállításai is újra kimentek. Most csak a ténylegesen megváltozott slot portja nyílik
+  újra (vagy az, amelyiknek az eszköze közben más sorszámot kapott, pl. újradugás után).
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

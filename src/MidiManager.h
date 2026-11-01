@@ -154,6 +154,9 @@ private:
     QList<RtMidiOut*> midiOutList;
     QList<int> portOutInterfaceIndex;
     QList<bool> portOutOpened;
+    // Windows fork: a slotokon megnyitott portok neve (a változatlan beállítás felismeréséhez)
+    QStringList openedInPortNames;
+    QStringList openedOutPortNames;
 
     bool presetProgramChangeEnabled;
     int presetProgramChangeSlot;
