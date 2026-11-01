@@ -21,10 +21,21 @@
 */
 
 #include "LogFile.h"
+#include <QFileInfo>
+
+// Windows fork: a napló legfeljebb ekkora lehet; e fölött a program átnevezi ".old" végűre (a
+// korábbi ".old" törlődik), és új naplót kezd. Így a két fájl együtt legfeljebb kb. 10 MB.
+// Eredetileg a napló korlátlanul nőtt, pl. kihúzott MIDI-eszköznél minden üzenet egy hibasort írt.
+#define LOG_MAX_SIZE (5 * 1024 * 1024)
 
 
 LogFile::LogFile( QString fileName ) {
     logFile.setFileName( fileName );
+    // Windows fork: túl nagy napló átnevezése már indításkor
+    if ( QFileInfo(fileName).size() > LOG_MAX_SIZE )   {
+        QFile::remove( fileName + ".old" );
+        QFile::rename( fileName, fileName + ".old" );
+    }
     logReady 	= logFile.open( QIODevice::Append | QIODevice::Text );
     stopLog		= false;
     logData.clear();
@@ -116,6 +127,7 @@ void LogFile::run (void) {
             QCoreApplication::processEvents();
             // Windows fork: UTF-8, hogy az ékezetes eszköz- és presetnevek se legyenek '?' a naplóban
             logFile.write( str.toUtf8() );
+            this->rotateIfTooLarge();     // Windows fork
         }
         logFile.flush();
         QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -123,6 +135,18 @@ void LogFile::run (void) {
     }
     logFile.close();
     return;
+}
+
+
+// Windows fork: futás közben is figyeljük a méretet (csak a naplózó szál írja a fájlt)
+void LogFile::rotateIfTooLarge( void ) {
+    if ( !logFile.isOpen() || logFile.size() <= LOG_MAX_SIZE )
+        return;
+    QString fileName = logFile.fileName();
+    logFile.close();
+    QFile::remove( fileName + ".old" );
+    QFile::rename( fileName, fileName + ".old" );
+    logFile.open( QIODevice::Append | QIODevice::Text );
 }
 
 

@@ -112,6 +112,10 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bugfix**: For a new element the note range labels showed "C-1" / "G9" (the UI default
   text), while loaded elements showed the program's own naming, "C-2" / "G8". New elements
   now use the program's naming too.
+- **Bugfix**: The log file (`%TEMP%\MidiLayer.log`) grew without limit (e.g. with an
+  unplugged MIDI device every sent message wrote an error line). Above 5 MB it is now
+  renamed to `MidiLayer.log.old` (replacing the previous `.old`) and a new log is started;
+  the two files take about 10 MB at most.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

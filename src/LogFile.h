@@ -57,6 +57,7 @@ private:
     void 	run(void);
     QString	timeStamp(void);
     QString time( void );
+    void    rotateIfTooLarge( void );     // Windows fork: a napló méretkorlátja
 
 public:
     LogFile( QString fileName );
