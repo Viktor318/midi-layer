@@ -67,6 +67,14 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   - Program Change-re érkező váltáskor nem kérdez (élőben nincs, aki válaszoljon), és nem
     is ment: a módosítások elvesznek, ezt a napló rögzíti;
   - a presetlistában a mentetlen módosítású preset neve után csillag (*) áll.
+- **Hibajavítás – metronóm**:
+  - A tap tempo rendre túl gyors tempót adott (az első koppintás kimaradt, és rossz
+    számú közzel osztott). Most az utolsó legfeljebb 8 koppintás átlagos közéből számol.
+  - Bekapcsoláskor az első ütés kétszer villant (az időzítő 0 ms-mal indult).
+  - Kikapcsoláskor az időzítő tovább ketyegett (csak akkor fut tovább, ha az UDP-küldés be
+    van kapcsolva).
+  - Preset-váltáskor a tempótárcsa csak látszólag állt át: a belső értéke a régi maradt, és
+    a metronóm következő be- vagy kikapcsolásakor ez a régi tempó került az új presetbe.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

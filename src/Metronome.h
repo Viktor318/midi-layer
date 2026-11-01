@@ -8,6 +8,8 @@
 #include <QList>
 #include <QFont>
 #include <cmath>
+#include <QElapsedTimer>
+#include <QSignalBlocker>
 
 #include "Led.h"
 #include "Logger.h"
@@ -56,8 +58,8 @@ private:
     QAction * decrementAction;
     int tapTempoCount;
     int nextBeatTime;
-    QList<QTime> tapTempoRecords;
-    QTime tapTempoStopwatch;
+    QList<qint64> tapTempoRecords;          // Windows fork: a koppintások ideje (ms, tapTempoClock)
+    QElapsedTimer tapTempoClock;            // Windows fork
     QString localHostName;
     QString currentPresetName;
 

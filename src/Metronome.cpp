@@ -228,6 +228,9 @@ void Metronome::slotSetActive(bool active) {
 void Metronome::refreshActive(bool active)  {
     //if (active != this->timer->isActive())  {
         if (active) {
+            // Windows fork: az időzítő az első indításkor 0 ms-os intervallummal indult (azt csak az
+            // első ütés állította be), így az első ütés azonnal kétszer szólt / villant
+            this->timer->setInterval(this->nextBeatTime);
             this->timer->start();
             this->led->flash();
             LOG_TRACE("Send metronome UDP info");
@@ -240,7 +243,12 @@ void Metronome::refreshActive(bool active)  {
             if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Metronome set to ON"));
         }
         else    {
-            // this->timer->stop();
+            // Windows fork: kikapcsoláskor az időzítő leáll. Az eredeti kódban ez ki volt
+            // kommentezve, és az időzítő tovább ketyegett; erre csak az UDP-s metronóm-kliens
+            // miatt lehet szükség (minden ütésnél állapotot küld), ezért csak akkor fut tovább,
+            // ha az UDP-küldés be van kapcsolva.
+            if (!Preferences::get()->getSendMetronomeUdp())
+                this->timer->stop();
             this->sendUDP();
             ui->buttonOnOff->setText(tr("OFF"));
             ui->buttonOnOff->setStyleSheet("color: rgb(0,0, 0);");            
@@ -263,12 +271,17 @@ void Metronome::setBpm(int bpm) {
 }
 
 
+// Windows fork: az eredeti a tárcsát kikapcsolt követéssel (setTracking(false)) állította, így csak
+// a tárcsa helyzete változott, az értéke (value, getBpm) nem: a következő metronóm-esemény
+// (be- / kikapcsolás) a RÉGI preset BPM-jét küldte vissza a presetnek, és az mentődött el.
+// Most az érték is beáll, a jelek letiltásával (így a preset nem lesz szerkesztett).
 void Metronome::slotSetBpm(int bpm) {
-    ui->dialTempo->setTracking(false);
-    ui->dialTempo->setSliderPosition(bpm);
-    ui->dialTempo->setTracking(true);
+    {
+        QSignalBlocker blocker(ui->dialTempo);
+        ui->dialTempo->setValue(bpm);
+    }
     // Use dial for limit minimum and maximum value
-    this->refreshBpm(ui->dialTempo->sliderPosition());
+    this->refreshBpm(ui->dialTempo->value());
 }
 
 
@@ -332,29 +345,30 @@ void Metronome::slotTapTempoTimeOut()   {
 }
 
 
+// Windows fork: a tap tempo javítása. Az eredeti az első koppintás idejét nem jegyezte fel, és a
+// BPM-et n koppintás helyett n-1 közre számolta rosszul (60000 * n / összeg - helyesen n-1 köz
+// van), így a kapott tempó rendre túl gyors lett. Most minden koppintás bekerül, a tempó az
+// utolsó legfeljebb 8 koppintás átlagos közéből számol, és 2 másodperc szünet után új mérés indul.
 void Metronome::slotTapTempo()  {
 
     if (!tapTempoTimer->isActive())  {
         tapTempoRecords.clear();
-        tapTempoTimer->start();
-        // tapTempoStopwatch.start();
+        tapTempoClock.start();
         ui->buttonTapTempo->setStyleSheet("color: rgb(255, 64, 64);");
     }
-    else    {
-        if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("### slotTapTempo TAP ENabled"));
-        tapTempoRecords.append(tapTempoStopwatch.currentTime());
-        tapTempoTimer->start();
-        this->led->flash();
-    }
+    tapTempoRecords.append(tapTempoClock.elapsed());
+    while (tapTempoRecords.count() > 8)
+        tapTempoRecords.removeFirst();
+    tapTempoTimer->start();
+    this->led->flash();
 
     int samples = tapTempoRecords.count();
     if (samples>1)  {
-        int sum = 0;
-        for(int i=1; i<samples; i++)    {
-            sum += tapTempoRecords.at(i).msecsSinceStartOfDay()-tapTempoRecords.at(i-1).msecsSinceStartOfDay();
-        }
-        if (sum>0)  {
-            ui->dialTempo->setSliderPosition((int) 60000*samples/sum);
+        qint64 span = tapTempoRecords.last() - tapTempoRecords.first();
+        if (span>0)  {
+            int bpm = qRound( 60000.0 * (samples-1) / span );
+            if (ISLOGGABLE_DEBUG) LOG_DEBUG(QString("Tap tempo: %1 taps, %2 BPM").arg(samples).arg(bpm));
+            ui->dialTempo->setValue(bpm);
         }
     }
 }

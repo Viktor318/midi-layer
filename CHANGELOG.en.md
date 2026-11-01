@@ -65,6 +65,16 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   - on a preset change by Program Change it does not ask (nobody can answer during a live
     performance) and does not save: the changes are lost, and this is logged;
   - in the preset list, a preset with unsaved changes is marked with an asterisk (*).
+- **Bugfix – metronome**:
+  - Tap tempo always gave too fast a tempo (the first tap was skipped and the sum was
+    divided by the wrong number of intervals). It now uses the average interval of the
+    last 8 taps at most.
+  - When switched on, the first beat flashed twice (the timer started with 0 ms).
+  - When switched off, the timer kept ticking (it now keeps running only if UDP sending is
+    enabled).
+  - On preset change the tempo dial only appeared to change: its internal value stayed the
+    old one, and the next time the metronome was switched on or off, this old tempo was
+    stored in the new preset.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
