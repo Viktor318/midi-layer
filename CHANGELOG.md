@@ -24,6 +24,10 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   utólag választottuk ki, az aktív preset hangszer-beállításai (SysEx, bank, program,
   hangerő) nem jutottak el a szintihez, és minden az alap hangszínen szólt a következő
   preset-váltásig. Most a kimeneti port megnyitásakor ezek újra kimennek.
+- **Hibajavítás**: Ha egy Program Change nagyobb volt, mint a bank presetjeinek száma,
+  a program leválasztotta az aktuális presetet, de újat nem választott, így minden
+  elnémult. Most az ilyen Program Change-et figyelmen kívül hagyja, és az aktuális
+  preset marad.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).

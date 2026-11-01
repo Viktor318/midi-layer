@@ -124,6 +124,15 @@ void PresetsListWidget::slotPreservePresetOrder(bool preserve)    {
 
 void PresetsListWidget::slotChangePresetByProgramChange(int programChangeValue)    {
     if (ISLOGGABLE_DEBUG) LOG_DEBUG("Changing preset by program change...");
+    // Windows fork: ha nincs ennyi preset, a Program Change-et figyelmen kívül hagyjuk, és az
+    // aktuális preset marad. Az eredeti kód a tartományon kívüli sorszámot is átadta a
+    // listának; ilyenkor a lista kijelölése megszűnt, a program leválasztotta az aktuális
+    // presetet, de újat nem választott - minden elnémult, amíg kézzel ki nem jelöltünk egyet.
+    if (programChangeValue < 0 || programChangeValue >= presetList->count())   {
+        if (ISLOGGABLE_INFO) LOG_INFO(QString("Program change %1 ignored: the bank has only %2 presets")
+                                      .arg(programChangeValue + 1).arg(presetList->count()));
+        return;
+    }
     presetList->setCurrentRow(programChangeValue);
 }
 
