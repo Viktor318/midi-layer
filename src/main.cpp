@@ -224,6 +224,11 @@ void addFontFiles() {
 
     for (int f=0; f<fontFileNames.length(); f++)    {
         fontFile = Utils::get()->getPreferencesDir() + "/" + APP_FONTS_DIR + "/" + fontFileNames.at(f);
+        // Windows fork: nem hordozható módban (--non-portable) a beállítások mappája a felhasználói
+        // mappa, a betűtípusok viszont a program mellett vannak; ilyenkor onnan töltjük be őket.
+        // Eredetileg ilyenkor a betűtípusok nem töltődtek be, és a felület alapbetűvel jelent meg.
+        if ( !QFile::exists(fontFile) )
+            fontFile = QCoreApplication::applicationDirPath() + "/" + APP_FONTS_DIR + "/" + fontFileNames.at(f);
         if ( QFile::exists(fontFile) )   {
             QFontDatabase::addApplicationFont ( fontFile );
         } else  {

@@ -116,6 +116,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
   unplugged MIDI device every sent message wrote an error line). Above 5 MB it is now
   renamed to `MidiLayer.log.old` (replacing the previous `.old`) and a new log is started;
   the two files take about 10 MB at most.
+- **Bugfix**: In non-portable mode (`--non-portable`) the program did not find its fonts,
+  and the UI used the default font. They are now loaded from the `fonts` folder next to
+  the program in this case.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).

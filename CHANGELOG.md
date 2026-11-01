@@ -114,6 +114,9 @@ A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
   MIDI-eszköznél minden elküldött üzenet egy hibasort írt). Most 5 MB fölött a program
   `MidiLayer.log.old` néven félreteszi (a korábbi `.old` törlődik), és új naplót kezd;
   a két fájl együtt legfeljebb kb. 10 MB.
+- **Hibajavítás**: Nem hordozható módban (`--non-portable`) a program nem találta a
+  betűtípusait, és a felület alapbetűvel jelent meg. Most ilyenkor a program melletti
+  `fonts` mappából tölti be őket.
 - Windowson a virtuális MIDI-portok nem jönnek létre (a Windows MM API nem támogatja).
 - Fusion felületi stílus alapértelmezésként, mert a Windows 11-es stílus levágta a
   számmezők tartalmát (a `-style <név>` argumentummal felülbírálható).
