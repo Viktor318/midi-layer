@@ -95,6 +95,8 @@ public:
     void sendSeqPosition(int position);
     void sendSeqSelectSong(int songId);
 
+    void setProgramChangeEnabled(bool enabled);
+    bool isProgramChangeEnabled();
     void setProgramChangeSlot(int portIndex);
     int getProgramChangeSlot();
     void setProgramChangeChannel(int channelIndex);
@@ -148,6 +150,7 @@ private:
     QList<int> portOutInterfaceIndex;
     QList<bool> portOutOpened;
 
+    bool presetProgramChangeEnabled;
     int presetProgramChangeSlot;
     int presetProgramChangeChannel;
 

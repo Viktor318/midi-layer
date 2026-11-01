@@ -263,6 +263,7 @@ void MainWindow::saveSettings(void) {
         settings.setValue(QString("inPort%1").arg(m+1), MidiManager::get()->getInPortNameAtSlot(m) );
         settings.setValue(QString("outPort%1").arg(m+1), MidiManager::get()->getOutPortNameAtSlot(m) );
     }
+    settings.setValue("programChangeEnabled", MidiManager::get()->isProgramChangeEnabled());
     settings.setValue("programChangeSlot", MidiManager::get()->getProgramChangeSlot()+1);
     settings.setValue("programChangeChannel", MidiManager::get()->getProgramChangeChannel()+1);
     settings.setValue("sequencerControllerSlot", MidiManager::get()->getSequencerControllerSlot()+1);
@@ -310,6 +311,7 @@ void MainWindow::loadSettings(void) {
             MidiManager::get()->setMidiInSelected(m,  settings.value(QString("inPort%1").arg(m+1)).toString());
             MidiManager::get()->setMidiOutSelected(m, settings.value(QString("outPort%1").arg(m+1)).toString());
         }
+        MidiManager::get()->setProgramChangeEnabled(settings.value("programChangeEnabled", true).toBool());
         MidiManager::get()->setProgramChangeSlot(settings.value("programChangeSlot", 1).toInt()-1);
         MidiManager::get()->setProgramChangeChannel(settings.value("programChangeChannel", 1).toInt()-1);
         MidiManager::get()->setSequencerControllerSlot(settings.value("sequencerControllerSlot", 1).toInt()-1);

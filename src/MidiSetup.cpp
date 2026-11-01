@@ -49,6 +49,10 @@ MidiSetup::MidiSetup(QWidget *parent) :
     }
 
     ui->programChangeSlot->setMaximum(MIDI_SLOTS);
+
+    // Windows fork: kikapcsolt presetváltásnál a slot és a csatorna nem állítható.
+    connect(ui->programChangeEnabled, SIGNAL( toggled(bool) ), ui->programChangeSlot, SLOT( setEnabled(bool) ) );
+    connect(ui->programChangeEnabled, SIGNAL( toggled(bool) ), ui->programChangeChannel, SLOT( setEnabled(bool) ) );
     ui->sequencerControllerSlot->setMaximum(MIDI_SLOTS);
 
     QObject::connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
@@ -103,6 +107,9 @@ void MidiSetup::refreshCombos(bool fromMidiSettings) {
 void MidiSetup::showEvent ( QShowEvent * /*event*/ )    {
     MidiManager::get()->refresh();
     this->refreshCombos(true);
+    ui->programChangeEnabled->setChecked( MidiManager::get()->isProgramChangeEnabled() );
+    ui->programChangeSlot->setEnabled( MidiManager::get()->isProgramChangeEnabled() );
+    ui->programChangeChannel->setEnabled( MidiManager::get()->isProgramChangeEnabled() );
     ui->programChangeSlot->setValue( MidiManager::get()->getProgramChangeSlot()+1 );
     ui->programChangeChannel->setValue( MidiManager::get()->getProgramChangeChannel()+1 );
     ui->sequencerControllerSlot->setValue( MidiManager::get()->getSequencerControllerSlot()+1 );
@@ -126,6 +133,7 @@ void MidiSetup::slotApplySetup() {
         MidiManager::get()->setMidiInSelected(i, midiInCombos.at(i)->currentText() );
         MidiManager::get()->setMidiOutSelected(i, midiOutCombos.at(i)->currentText() );
     }
+    MidiManager::get()->setProgramChangeEnabled( ui->programChangeEnabled->isChecked() );
     MidiManager::get()->setProgramChangeSlot( ui->programChangeSlot->value()-1 );
     MidiManager::get()->setProgramChangeChannel( ui->programChangeChannel->value()-1 );
     MidiManager::get()->setSequencerControllerSlot( ui->sequencerControllerSlot->value()-1 );

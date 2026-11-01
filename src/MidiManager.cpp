@@ -174,6 +174,7 @@ void MidiManager::init()  {
     }
 
     // Port Index and Channel for program change
+    presetProgramChangeEnabled = true;
     presetProgramChangeSlot = 0;
     presetProgramChangeChannel = 0;
     sequencerControllerSlot = 0;
@@ -475,7 +476,10 @@ void MidiManager::relayMessage(ChannelMessage channelMessage)   {
 
     if (this->active)    {
         // Filter the ProgramChange to MidiLyer change preset functionality.
-        if ( channelMessage.getStatus() == STATUS_PRGCHG &&
+        // Windows fork: a presetváltás Program Change-re kikapcsolható; ilyenkor a PC
+        // a többi üzenethez hasonlóan továbbmegy a kimenetekre.
+        if ( presetProgramChangeEnabled &&
+             channelMessage.getStatus() == STATUS_PRGCHG &&
              (presetProgramChangeSlot==-1 || channelMessage.getSlotNumber() == presetProgramChangeSlot) &&
              (presetProgramChangeChannel==-1 || channelMessage.getChannel() == presetProgramChangeChannel) ) {
             emit receivedProgramChange( channelMessage.getByte1() );
@@ -836,6 +840,16 @@ void MidiManager::allNotesOff() {
     for (int slotIndex=0; slotIndex<MIDI_SLOTS; slotIndex++)    {
         this->allNotesOff(slotIndex);
     }
+}
+
+
+void MidiManager::setProgramChangeEnabled(bool enabled)    {
+    presetProgramChangeEnabled = enabled;
+}
+
+
+bool MidiManager::isProgramChangeEnabled()    {
+    return presetProgramChangeEnabled;
 }
 
 

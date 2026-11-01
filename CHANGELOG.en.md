@@ -26,6 +26,9 @@ Based on the author's 2021 version 1.1.0-alfa3 from the SourceForge git reposito
 - **Bug fix**: A Program Change higher than the number of presets in the bank
   deselected the current preset without selecting a new one, so everything went
   silent. Such Program Changes are now ignored and the current preset stays active.
+- Preset switching by Program Change can be turned off on the "input/output options"
+  tab of MIDI Setup (on by default). When it is off, all Program Changes are forwarded
+  to the outputs.
 - On Windows the virtual MIDI ports are not created (not supported by the Windows MM API).
 - Fusion widget style by default, because the Windows 11 style clipped the contents
   of the number fields (can be overridden with `-style <name>`).
