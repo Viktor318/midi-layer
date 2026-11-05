@@ -44,7 +44,8 @@ Az eredeti projekt: https://sourceforge.net/projects/midi-layer/
 A projektnek a SourceForge-on két forráskódtára van:
 
 - **SVN** (`code`): a 2012–2016 közötti fejlesztés, az utolsó revízió az r89
-  (1.0.0-s verzió, 2016). Ebben a forkban a `qt6-windows` ág erre épül.
+  (1.0.0-s verzió, 2016). Ebben a forkban az erre épülő első Qt 6-os port a
+  `qt6-windows-1.0.0` címkén érhető el (már nem fejlesztjük).
 - **Git** (`repo`): a szerző 2021 decemberében itt folytatta a fejlesztést, egészen
   az **1.1.0-alfa3** verzióig (Qt 6-ra átdolgozva, 4 virtuális MIDI-port, a MIDI
   Setup állapotának megőrzése, sok felületi javítás). Ebben a forkban az

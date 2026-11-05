@@ -44,7 +44,8 @@ The original project: https://sourceforge.net/projects/midi-layer/
 The project has two source repositories on SourceForge:
 
 - **SVN** (`code`): development from 2012 to 2016, last revision r89
-  (version 1.0.0, 2016). In this fork the `qt6-windows` branch is based on it.
+  (version 1.0.0, 2016). In this fork the first Qt 6 port based on it is kept
+  under the `qt6-windows-1.0.0` tag (no longer developed).
 - **Git** (`repo`): the author continued development here in December 2021, up to
   version **1.1.0-alfa3** (reworked for Qt 6, 4 virtual MIDI ports, MIDI Setup
   state kept, many visual improvements). In this fork the `upstream-2021` branch
