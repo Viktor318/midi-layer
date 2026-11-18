@@ -19,6 +19,20 @@ Slotok és csatornák kezelése, a sebesség (velocity) és a hangerő állítá
 - Szekvencer-vezérlő
 - Presetek és elemek egyszerű kezelése fájlkezelőben
 
+## Letöltés és használat (Windows)
+
+A kész Windowsos csomag a GitHub **Releases** oldaláról tölthető le
+(`MidiLayer-<verzió>-win64.zip`).
+
+1. Csomagold ki egy olyan mappába, ahová a felhasználónak van írási joga
+   (pl. `C:\MidiLayer` vagy a Dokumentumok alá) – **ne** a `Program Files` alá.
+2. Indítsd el a `MidiLayer.exe`-t.
+3. A MIDI-eszközöket a *MIDI Setup* ablakban lehet a slotokhoz rendelni.
+
+A program hordozható módban fut: a bankok, presetek és a beállítások a program
+melletti `data` mappában és `midiLayer.ini` fájlban vannak, így a mappa egyben
+átmásolható egy másik gépre. Telepítés nem kell.
+
 ## Build
 
 A projekt Qt-alapú C++ alkalmazás (lásd `src/midiLayer.pro`), és a [RtMidi](https://www.music.mcgill.ca/~gary/rtmidi/) könyvtárat használja a MIDI kommunikációhoz (a `src/RtMidi` mappában található). A futtatáshoz szükséges adatok (demo bank, betűtípusok, alapbeállítások) a `dist` mappában vannak.

@@ -2,7 +2,7 @@
 
 A MidiLayer minden lényeges változása ebben a fájlban van dokumentálva.
 
-## 1.1.0-alfa3 – Windows fork (Viktor318)
+## 1.1.0-win1 – Windows fork (Viktor318), 2026-11-18
 
 A szerző 2021-es, SourceForge git-tárolóbeli 1.1.0-alfa3 verziójára épül.
 

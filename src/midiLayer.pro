@@ -17,7 +17,7 @@
 #
 
 
-VERSION=1.1.0-alfa3
+VERSION=1.1.0-win1
 
 #unix    {
 #    VERSION=$$system(echo $(date +%Y\-%m\-%d\_%H\:%M))

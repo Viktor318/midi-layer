@@ -19,6 +19,20 @@ Manage slots and channels, adjust the velocity and the volume, customize the not
 - Sequencer controller
 - Easy to manage presets and elements in file explorer
 
+## Download and use (Windows)
+
+The ready-made Windows package can be downloaded from the GitHub **Releases** page
+(`MidiLayer-<version>-win64.zip`).
+
+1. Extract it to a folder the user can write to (e.g. `C:\MidiLayer` or under
+   Documents) – **not** under `Program Files`.
+2. Start `MidiLayer.exe`.
+3. Assign the MIDI devices to the slots in the *MIDI Setup* window.
+
+The program runs in portable mode: banks, presets and settings are kept in the
+`data` folder and the `midiLayer.ini` file next to the program, so the whole folder
+can be copied to another computer. No installation is needed.
+
 ## Build
 
 This is a Qt-based C++ application (see `src/midiLayer.pro`), using the [RtMidi](https://www.music.mcgill.ca/~gary/rtmidi/) library for MIDI communication (bundled in the `src/RtMidi` folder). The runtime data (demo bank, fonts, default settings) is in the `dist` folder.
